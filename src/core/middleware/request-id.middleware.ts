@@ -1,0 +1,11 @@
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
+
+@Injectable()
+export class RequestIdMiddleware implements NestMiddleware {
+  use(req: any, res: any, next: () => void) {
+    req.requestId = uuid();
+    res.setHeader('X-Request-Id', req.requestId);
+    next();
+  }
+}
