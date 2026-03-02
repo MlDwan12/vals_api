@@ -1,27 +1,33 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import appConfig from './core/config/app.config';
-import databaseConfig from './core/config/database.config';
-import loggerConfig from './core/config/logger.config';
+import appConfig from './config/app.config';
+import databaseConfig from './config/database.config';
+import loggerConfig from './config/logger.config';
 import { LoggerModule } from 'nestjs-pino';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoreModule } from './core/core.module';
-import { BlogModule } from './modules/blog/blog.module';
-import { CasesModule } from './modules/cases/cases.module';
-import { CategoryModule } from './modules/category/category.module';
-import { SubcategoryModule } from './modules/subcategory/subcategory.module';
-import { CategoryBlogModule } from './modules/category_blog/category_blog.module';
-import { KnowlageBaseModule } from './modules/knowlage_base/knowlage_base.module';
-import { ServicesModule } from './modules/services/services.module';
-import { SubcategoryBlogModule } from './modules/subcategory_blog/subcategory_blog.module';
 import { DatabaseConfig } from './shared/types/config/db.config.type';
 import { LoggerConfig } from './shared/types/config/logger.config.type';
+import { FaqModule } from './modules/faq/faq.module';
+import { IndustryModule } from './modules/industry/industry.module';
+
+import bitrixConfig from './config/bitrix.config';
+import mailConfig from './config/mail.config';
+import { CasesModule } from './modules/cases/cases.module';
+import { ServicesModule } from './modules/services/services.module';
+import { ServiceCategoriesModule } from './modules/service_categories/service_categories.module';
+import { ServiceStepsModule } from './modules/service_steps/service_steps.module';
+import { TariffsModule } from './modules/tariffs/tariffs.module';
+import { TariffPeriodsModule } from './modules/tariff_periods/tariff_periods.module';
+import { UsersModule } from './modules/users/users.module';
+import { BitrixModule } from './modules/bitrix/bitrix.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, loggerConfig],
+      load: [appConfig, databaseConfig, loggerConfig, bitrixConfig, mailConfig],
     }),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
@@ -62,14 +68,17 @@ import { LoggerConfig } from './shared/types/config/logger.config.type';
       },
     }),
     CoreModule,
-    BlogModule,
+    FaqModule,
     CasesModule,
-    CategoryModule,
-    SubcategoryModule,
-    CategoryBlogModule,
-    KnowlageBaseModule,
+    IndustryModule,
     ServicesModule,
-    SubcategoryBlogModule,
+    ServiceCategoriesModule,
+    ServiceStepsModule,
+    TariffsModule,
+    TariffPeriodsModule,
+    UsersModule,
+    BitrixModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

@@ -1,0 +1,7 @@
+export enum CaseIndustry {
+  FINANCE = 'FINANCE',
+  REAL_ESTATE = 'REAL_ESTATE',
+  MEDICINE = 'MEDICINE',
+  ECOMMERCE = 'ECOMMERCE',
+  OTHER = 'OTHER',
+}

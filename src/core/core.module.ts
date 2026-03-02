@@ -1,9 +1,9 @@
 import { Global, Module, MiddlewareConsumer } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
-import { ResponseInterceptor } from './interceptors/response.interceptor';
+import { AllExceptionsFilter } from '../common/filters/http-exception.filter';
+import { ResponseInterceptor } from '../common/interceptors/response.interceptor';
 
-import { RequestIdMiddleware } from './middleware/request-id.middleware';
+import { RequestIdMiddleware } from '../common/middleware/request-id.middleware';
 
 @Global()
 @Module({
@@ -14,7 +14,7 @@ import { RequestIdMiddleware } from './middleware/request-id.middleware';
     },
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: AllExceptionsFilter,
     },
   ],
   exports: [],

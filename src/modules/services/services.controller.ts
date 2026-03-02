@@ -1,42 +1,79 @@
+import { Controller, Get, Param } from '@nestjs/common';
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
-import { ServicesService } from './services.service';
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Service } from './entities/service.entity';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { ServicesService } from './services.service';
+import { BaseCrudController } from 'src/core/crud/base.controller';
 
+@ApiTags('Услуги')
 @Controller('services')
-export class ServicesController {
-  constructor(private readonly servicesService: ServicesService) {}
+export class ServicesController extends BaseCrudController<
+  Service,
+  CreateServiceDto,
+  UpdateServiceDto
+> {
+  protected entityName: string;
 
-  @Post()
-  create(@Body() createServiceDto: CreateServiceDto) {
-    return this.servicesService.create(createServiceDto);
+  constructor(protected readonly service: ServicesService) {
+    super(service);
   }
 
-  @Get()
-  findAll() {
-    return this.servicesService.findAll();
+  @Get('all/info')
+  async findAllWithRelations() {
+    try {
+      return await this.service.findAllWithRelations();
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.servicesService.findOne(+id);
+  @Get('all/short-info')
+  async getShortServiceInfoList() {
+    try {
+      return await this.service.findListServiceShortInfo();
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateServiceDto: UpdateServiceDto) {
-    return this.servicesService.update(+id, updateServiceDto);
+  @Get('all/full-info')
+  async getFullServiceInfoList() {
+    try {
+      return await this.service.findListServiceFullInfo();
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.servicesService.remove(+id);
+  @Get('list/faq')
+  async getListServicesWithFaq() {
+    try {
+      return await this.service.getListServicesWithFaq();
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
+  }
+
+  @Get('info/service/:slug')
+  @ApiOperation({ summary: 'Получить элемент по ID' })
+  @ApiOkResponse({ description: 'Элемент найден' })
+  @ApiNotFoundResponse({ description: 'Элемент не найден' })
+  async getServiceInfo(@Param('slug') slug: string) {
+    try {
+      return await this.service.findOneByIDWithRelations(slug);
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
   }
 }
