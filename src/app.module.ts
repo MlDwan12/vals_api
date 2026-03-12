@@ -22,6 +22,11 @@ import { TariffPeriodsModule } from './modules/tariff_periods/tariff_periods.mod
 import { UsersModule } from './modules/users/users.module';
 import { BitrixModule } from './modules/bitrix/bitrix.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ArticlesModule } from './modules/articles/articles.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { ImageLibModule } from './modules/image-lib/image-lib.module';
+import { ClientModule } from './modules/client/client.module';
 
 @Module({
   imports: [
@@ -67,6 +72,16 @@ import { AuthModule } from './modules/auth/auth.module';
         };
       },
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads', // URL-префикс
+      exclude: ['/docs*'], // чтобы не было конфликтов
+      serveStaticOptions: {
+        fallthrough: false, // fail-fast если файл не найден
+        maxAge: '7d', // кеширование для статики
+        immutable: true,
+      },
+    }),
     CoreModule,
     FaqModule,
     CasesModule,
@@ -79,6 +94,9 @@ import { AuthModule } from './modules/auth/auth.module';
     UsersModule,
     BitrixModule,
     AuthModule,
+    ArticlesModule,
+    ImageLibModule,
+    ClientModule,
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Tariff } from './entities/tariff.entity';
 import { CreateTariffDto } from './dto/create-tariff.dto';
 import { UpdateTariffDto } from './dto/update-tariff.dto';
@@ -130,5 +130,80 @@ export class TariffsService extends BaseCrudService<
     });
 
     return entity;
+  }
+  async update(id: number, dto: UpdateTariffDto): Promise<Tariff> {
+    const tariff = await this.repo.findOne({
+      where: { id },
+      relations: ['service'],
+    });
+
+    if (!tariff) {
+      throw new NotFoundException(`Tariff with ID ${id} not found`);
+    }
+
+    const { serviceId, periodsIds, ...rest } = dto;
+
+    if (serviceId !== undefined) {
+      const service = await this.servicesService.findOneOrFail({
+        where: { id: serviceId },
+      });
+      tariff.service = service;
+    }
+
+    Object.assign(tariff, rest);
+
+    if (periodsIds !== undefined || dto.basePrice !== undefined) {
+      const currentBasePrice = tariff.basePrice;
+
+      if (currentBasePrice === undefined || currentBasePrice === null) {
+        throw new NotFoundException('Base price is missing for tariff');
+      }
+
+      let actualPeriodIds: number[];
+
+      if (periodsIds !== undefined) {
+        actualPeriodIds = periodsIds;
+      } else {
+        actualPeriodIds = tariff.billingCycles
+          ?.map((item) => item.periodId)
+          .filter((id): id is number => id !== null && id !== undefined) || [1];
+      }
+
+      const result: BillingCycle[] = [];
+
+      if (actualPeriodIds.length) {
+        const tariffPeriods =
+          await this.tariffPeriodService.findByIds(actualPeriodIds);
+
+        for (const period of tariffPeriods) {
+          const pricePerMonth =
+            period.months === 1
+              ? currentBasePrice
+              : currentBasePrice * (1 - period.discountPercent / 100);
+
+          result.push({
+            periodId: period.id,
+            monthCount: period.months,
+            pricePerMonth,
+            discountPercent: period.discountPercent,
+            totalPrice: pricePerMonth * period.months,
+          });
+        }
+      } else {
+        const monthPeriod = await this.tariffPeriodService.findById(1);
+
+        result.push({
+          periodId: monthPeriod.id,
+          monthCount: monthPeriod.months,
+          pricePerMonth: currentBasePrice,
+          discountPercent: null,
+          totalPrice: currentBasePrice,
+        });
+      }
+
+      tariff.billingCycles = result;
+    }
+
+    return this.repo.save(tariff);
   }
 }

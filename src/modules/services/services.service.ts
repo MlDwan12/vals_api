@@ -14,6 +14,7 @@ import {
   CATEGORY_FIELDS,
   FAQ_FIELDS,
   SERVICE_BASE_FIELDS,
+  SERVICE_MAIN_FIELDS,
   STAGE_FIELDS,
   TARIFF_FIELDS,
 } from './queries/service.selects';
@@ -50,6 +51,13 @@ export class ServicesService extends BaseCrudService<
       .createQueryBuilder('service')
       .leftJoin('service.category', 'category')
       .select([...SERVICE_BASE_FIELDS, ...CATEGORY_FIELDS])
+      .getMany();
+  }
+
+  async findListServiceMainInfo(): Promise<Service[]> {
+    return this.repository.repository
+      .createQueryBuilder('service')
+      .select([...SERVICE_MAIN_FIELDS])
       .getMany();
   }
 

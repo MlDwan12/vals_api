@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TariffPeriod } from './entities/tariff_period.entity';
 import { UpdateTariffPeriodDto } from './dto/update-tariff_period.dto';
@@ -17,5 +17,17 @@ export class TariffPeriodsController extends BaseCrudController<
 
   constructor(protected readonly service: TariffPeriodsService) {
     super(service);
+  }
+
+  @Get()
+  async getListPeriods() {
+    try {
+      console.log(12312312321);
+      
+      return await this.service.findAll();
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
   }
 }

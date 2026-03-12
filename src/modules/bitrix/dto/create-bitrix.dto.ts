@@ -1,54 +1,61 @@
 import {
-  IsString,
-  IsOptional,
-  IsBoolean,
+  IsEmail,
   IsEnum,
-  ValidateIf,
   IsNumber,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  MaxLength,
+  ValidateIf,
 } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import { LeadType } from 'src/shared/enums/lead-type.enum';
 
 export class CreateBitrixDto {
   @IsString()
+  @MaxLength(255)
   name: string;
 
   @IsString()
+  @MaxLength(32)
   phone: string;
 
   @IsEnum(LeadType)
   type: LeadType;
 
   @ValidateIf(
-    (o) =>
+    (o: CreateBitrixDto) =>
       o.type === LeadType.FREE_CONSULTATION || o.type === LeadType.FREE_AUDIT,
   )
   @IsOptional()
   @IsString()
+  @MaxLength(5000)
   message?: string;
 
-  // @ValidateIf((o) => o.type === LeadType.FREE_AUDIT)
-  // @IsBoolean()
-  // isTaskDefined?: boolean;
-
-  @ValidateIf((o) => o.type === LeadType.TARIFF_REQUEST)
+  @ValidateIf((o: CreateBitrixDto) => o.type === LeadType.TARIFF_REQUEST)
   @IsOptional()
-  @IsString()
+  @IsEmail()
+  @MaxLength(255)
   email?: string;
 
-  @ValidateIf((o) => o.type === LeadType.TARIFF_REQUEST)
+  @ValidateIf((o: CreateBitrixDto) => o.type === LeadType.TARIFF_REQUEST)
   @IsOptional()
   @IsString()
+  @MaxLength(5000)
   comment?: string;
 
-  @ValidateIf((o) => o.type === LeadType.TARIFF_REQUEST)
+  @ValidateIf((o: CreateBitrixDto) => o.type === LeadType.TARIFF_REQUEST)
+  @Type(() => Number)
   @IsNumber()
   tariffId?: number;
 
-  @ValidateIf((o) => o.type === LeadType.TARIFF_REQUEST)
+  @ValidateIf((o: CreateBitrixDto) => o.type === LeadType.TARIFF_REQUEST)
+  @Type(() => Number)
   @IsNumber()
   periodId?: number;
 
   @IsOptional()
   @IsString()
+  @MaxLength(4000)
   utm?: string;
 }

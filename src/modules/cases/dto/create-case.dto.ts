@@ -9,13 +9,21 @@ import {
   IsArray,
   MaxLength,
   Min,
+  ArrayMinSize,
 } from 'class-validator';
 
 export class CreateCaseDto {
+  @ApiProperty({
+    example: [1, 2, 3],
+    description: 'ID услуг, к которым привязан кейс',
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(50)
   @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  serviceId: number;
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  serviceIds: number[];
 
   @IsArray()
   @ArrayMaxSize(20)
@@ -26,6 +34,10 @@ export class CreateCaseDto {
   @IsString()
   @MaxLength(255)
   title: string;
+
+  @IsString()
+  @MaxLength(255)
+  slug: string;
 
   @IsOptional()
   @IsString()

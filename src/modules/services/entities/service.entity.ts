@@ -78,7 +78,7 @@ export class Service {
   tariffs: Tariff[];
 
   // Кейсы
-  @OneToMany(() => Case, (c) => c.service)
+  @OneToMany(() => Case, (c) => c.services)
   cases: Case[];
 
   // FAQ
@@ -86,8 +86,8 @@ export class Service {
   faq: Faq[];
 
   @CreateDateColumn({ name: 'date_create' })
-  dateCreate: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ name: 'date_update' })
-  dateUpdate: Date;
+  updatedAt: Date;
 }

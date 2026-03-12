@@ -25,8 +25,11 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(compression());
 
-  // CORS — НЕ делай enableCors('*') в продакшене!
-  app.enableCors('*');
+  app.enableCors({
+    // origin: config.get<string>('app.corsOrigin'),
+    origin: true,
+    credentials: true,
+  });
 
   // app.setGlobalPrefix('api');
 

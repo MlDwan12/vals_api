@@ -44,6 +44,16 @@ export class ServicesController extends BaseCrudController<
     }
   }
 
+  @Get('all/main-info')
+  async getMainServiceInfoList() {
+    try {
+      return await this.service.findListServiceMainInfo();
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
+  }
+
   @Get('all/full-info')
   async getFullServiceInfoList() {
     try {
@@ -64,7 +74,7 @@ export class ServicesController extends BaseCrudController<
     }
   }
 
-  @Get('info/service/:slug')
+  @Get('info/:slug')
   @ApiOperation({ summary: 'Получить элемент по ID' })
   @ApiOkResponse({ description: 'Элемент найден' })
   @ApiNotFoundResponse({ description: 'Элемент не найден' })

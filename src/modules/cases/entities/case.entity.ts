@@ -8,6 +8,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
 } from 'typeorm';
 
 @Entity('cases')
@@ -15,16 +17,16 @@ export class Case {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // ===== Связь с услугой =====
-  @Column({ name: 'service_id' })
-  serviceId: number;
-
-  @ManyToOne(() => Service, (service) => service.cases, {
+  // ===== Связь с услугами (M2M) =====
+  @ManyToMany(() => Service, (service) => service.cases, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'service_id' })
-  service: Service;
-
+  @JoinTable({
+    name: 'service_to_case',
+    joinColumn: { name: 'case_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'service_id', referencedColumnName: 'id' },
+  })
+  services: Service[];
   // ===== Отрасль: JSON массив строк =====
   // Пример: ["IT", "FinTech", "E-commerce"]
   @Column({ name: 'industry', type: 'jsonb', default: () => "'[]'" })
@@ -33,6 +35,9 @@ export class Case {
   // ===== Контент =====
   @Column({ type: 'varchar', length: 255 })
   title: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  slug: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
