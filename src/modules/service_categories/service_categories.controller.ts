@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ServiceCategoriesService } from './service_categories.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ServiceCategory } from './entities/service_category.entity';
@@ -17,5 +17,15 @@ export class ServiceCategoriesController extends BaseCrudController<
 
   constructor(protected readonly service: ServiceCategoriesService) {
     super(service);
+  }
+
+  @Get()
+  async getListCategory() {
+    try {
+      return await this.service.findAll();
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
   }
 }

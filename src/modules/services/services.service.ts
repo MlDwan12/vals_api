@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Service } from './entities/service.entity';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { PinoLogger } from 'nestjs-pino';
@@ -101,7 +101,7 @@ export class ServicesService extends BaseCrudService<
       .getOne();
 
     if (!service) {
-      throw new Error(`Service with slug ${slug} not found`);
+      throw new NotFoundException(`Service with slug ${slug} not found`);
     }
 
     return service;

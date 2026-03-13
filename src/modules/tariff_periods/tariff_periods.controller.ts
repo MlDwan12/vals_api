@@ -22,8 +22,6 @@ export class TariffPeriodsController extends BaseCrudController<
   @Get()
   async getListPeriods() {
     try {
-      console.log(12312312321);
-      
       return await this.service.findAll();
     } catch (e) {
       console.error('REAL ERROR:', e);

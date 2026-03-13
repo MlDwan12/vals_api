@@ -1,9 +1,9 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { BaseCrudController } from 'src/core/crud/base.controller';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 
 @ApiTags('Пользователи')
@@ -17,5 +17,11 @@ export class UsersController extends BaseCrudController<
 
   constructor(protected readonly service: UsersService) {
     super(service);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Создать пользователя' })
+  async createUser(@Body() dto: CreateUserDto): Promise<void> {
+    return this.service.createUser(dto);
   }
 }

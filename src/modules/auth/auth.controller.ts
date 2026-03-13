@@ -36,6 +36,8 @@ export class AuthController {
       dto.username,
       dto.password,
     );
+    console.log(user);
+
     if (!user) throw new UnauthorizedException();
 
     const tokens = await this.authService.login(user);
@@ -50,7 +52,7 @@ export class AuthController {
       sameSite: 'strict',
     });
 
-    return { message: 'ok' };
+    return { login: user.username, role: 'admin' };
   }
 
   @Post('refresh')

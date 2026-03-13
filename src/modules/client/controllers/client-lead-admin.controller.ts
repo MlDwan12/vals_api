@@ -19,6 +19,7 @@ import { ClientLeadAdminService } from '../services/client-lead-admin.service';
 import { ClientLeadEntity } from '../entities/client-lead.entity';
 import { ClientLeadQueryDto } from '../dto/client-lead-query.dto';
 import { PaginationResult } from 'src/core/crud/interfaces/pagination.interface';
+import { ClientLeadListItemDto } from '../dto/client-lead-list-item.dto';
 
 @ApiTags('client-leads')
 @ApiBearerAuth()
@@ -53,13 +54,7 @@ export class ClientLeadAdminController {
   @ApiOkResponse({ description: 'Список заявок клиента' })
   async findByClientId(
     @Param('clientId', ParseIntPipe) clientId: number,
-    @Query('page') page = '1',
-    @Query('limit') limit = '20',
-  ): Promise<PaginationResult<ClientLeadEntity>> {
-    return this.clientLeadAdminService.findByClientId(
-      clientId,
-      Number(page),
-      Number(limit),
-    );
+  ): Promise<ClientLeadListItemDto[]> {
+    return this.clientLeadAdminService.findByClientId(clientId);
   }
 }

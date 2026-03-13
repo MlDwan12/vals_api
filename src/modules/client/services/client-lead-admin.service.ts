@@ -4,6 +4,8 @@ import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { ClientLeadEntity } from '../entities/client-lead.entity';
 import { PaginationResult } from 'src/core/crud/interfaces/pagination.interface';
 import { ClientLeadQueryDto } from '../dto/client-lead-query.dto';
+import { ClientLeadMapper } from '../utils/client-lead.mapper';
+import { ClientLeadListItemDto } from '../dto/client-lead-list-item.dto';
 
 @Injectable()
 export class ClientLeadAdminService {
@@ -56,23 +58,34 @@ export class ClientLeadAdminService {
     };
   }
 
-  async findByClientId(
-    clientId: number,
-    page: number,
-    limit: number,
-  ): Promise<PaginationResult<ClientLeadEntity>> {
-    const [data, total] = await this.leadRepository.findAndCount({
+  async findByClientId(clientId: number): Promise<ClientLeadListItemDto[]> {
+    const entities = await this.leadRepository.find({
       where: { clientId },
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
     });
 
-    return {
-      data,
-      total,
-      page,
-      limit,
-    };
+    const data = ClientLeadMapper.toList(entities);
+
+    return data;
   }
 }
+
+//  {
+//                 "id": 2,
+//                 "clientId": 1,
+//                 "type": "TARIFF_REQUEST",
+//                 "name": "TEst",
+//                 "phoneRaw": "+7 991 234 56 78",
+//                 "emailRaw": "alex@example.com",
+//                 "message": null,
+//                 "comment": "Интересует тариф на 6 месяцев",
+//                 "utm": null,
+//                  serviceName: "",
+//                  tariffName: "",
+//                  period: "",
+//                    цена за месяц,
+//                    цена за весь период
+//                  "bitrixLeadId": "7727"
+//                     "TITLE": "Выбрана услуга - ORM (Управление репутацией в сети)",
+//                 "createdAt": "2026-03-11T07:16:37.551Z"
+//             },
