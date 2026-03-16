@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientService } from '../services/client.service';
 import { Client } from '../entities/client.entity';
@@ -15,6 +16,8 @@ import { CreateClientDto } from '../dto/create-client.dto';
 import { UpdateClientDto } from '../dto/update-client.dto';
 import { BaseCrudController } from 'src/core/crud/base.controller';
 import { FindOptionsWhere, ILike } from 'typeorm';
+import { DomainRestrictionGuard } from 'src/common/guards/domain-restriction.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('client')
 export class ClientController extends BaseCrudController<
@@ -29,6 +32,7 @@ export class ClientController extends BaseCrudController<
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   async getListClient(
     @Query('page', new ParseIntPipe({ optional: true })) page = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit = 20,

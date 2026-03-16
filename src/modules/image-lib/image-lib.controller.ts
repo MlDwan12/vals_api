@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ImageLibService } from './image-lib.service';
 import { CreateImageLibDto } from './dto/create-image-lib.dto';
@@ -22,6 +23,8 @@ import { diskStorage } from 'multer';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { mkdirSync } from 'fs';
 import { buildImageLibDestinationAbs } from './image-lib-path.util';
+import { DomainRestrictionGuard } from 'src/common/guards/domain-restriction.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('image-lib')
 export class ImageLibController extends BaseCrudController<
@@ -44,6 +47,7 @@ export class ImageLibController extends BaseCrudController<
     }
   }
   @Post('upload')
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   @UseInterceptors(
     FilesInterceptor('images', 10, {
       storage: diskStorage({
@@ -97,6 +101,7 @@ export class ImageLibController extends BaseCrudController<
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.removeWithFile(id);
   }

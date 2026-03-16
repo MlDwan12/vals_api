@@ -15,6 +15,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/create-auth.dto';
 import type { Request, Response } from 'express';
 import { JwtAuthGuard, RefreshGuard } from './jwt-auth.guard';
+import { DomainRestrictionGuard } from 'src/common/guards/domain-restriction.guard';
 
 export interface AuthRequest extends Request {
   user: {
@@ -29,6 +30,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @UseGuards(DomainRestrictionGuard)
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -57,7 +59,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   async me(@Req() req: AuthRequest) {
     const user = await this.authService.getMe(req.user.id);
 
@@ -65,7 +67,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(RefreshGuard)
+  @UseGuards(RefreshGuard, DomainRestrictionGuard)
   async refresh(
     @Req() req: AuthRequest,
     @Res({ passthrough: true }) res: Response,

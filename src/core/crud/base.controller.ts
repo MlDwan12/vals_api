@@ -27,6 +27,7 @@ import type { PaginationResult } from './interfaces/pagination.interface';
 import { BaseCrudService } from './base.service';
 import { FindManyOptions, FindOptionsWhere } from 'typeorm';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
+import { DomainRestrictionGuard } from 'src/common/guards/domain-restriction.guard';
 
 @ApiTags('crud')
 export abstract class BaseCrudController<
@@ -43,7 +44,7 @@ export abstract class BaseCrudController<
   }
 
   @Post()
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Создать новый элемент' })
   @ApiCreatedResponse({ description: 'Элемент успешно создан' })
@@ -86,7 +87,7 @@ export abstract class BaseCrudController<
   }
 
   @Patch(':id')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Обновить элемент по ID' })
   @ApiOkResponse({ description: 'Элемент обновлён' })
@@ -101,7 +102,7 @@ export abstract class BaseCrudController<
   }
 
   @Delete(':id')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить элемент по ID' })

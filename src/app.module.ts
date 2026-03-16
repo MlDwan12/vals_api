@@ -27,12 +27,20 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ImageLibModule } from './modules/image-lib/image-lib.module';
 import { ClientModule } from './modules/client/client.module';
+import securityConfig from './config/security.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, loggerConfig, bitrixConfig, mailConfig],
+      load: [
+        appConfig,
+        databaseConfig,
+        loggerConfig,
+        bitrixConfig,
+        mailConfig,
+        securityConfig,
+      ],
     }),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
