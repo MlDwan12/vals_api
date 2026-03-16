@@ -14,12 +14,13 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/create-auth.dto';
 import type { Request, Response } from 'express';
-import { RefreshGuard } from './jwt-auth.guard';
+import { JwtAuthGuard, RefreshGuard } from './jwt-auth.guard';
 
 export interface AuthRequest extends Request {
   user: {
     id: number;
     username: string;
+    role: string;
   };
 }
 
@@ -51,6 +52,14 @@ export class AuthController {
       httpOnly: true,
       sameSite: 'strict',
     });
+
+    return { login: user.username, role: 'admin' };
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async me(@Req() req: AuthRequest) {
+    const user = await this.authService.getMe(req.user.id);
 
     return { login: user.username, role: 'admin' };
   }

@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -36,6 +37,15 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  async getMe(userId: number) {
+    const user = await this.usersService.findOneOrFail({
+      where: { id: userId },
+    });
+    if (!user) throw new UnauthorizedException();
+
+    return user;
   }
 
   async refreshTokens(user: any) {
