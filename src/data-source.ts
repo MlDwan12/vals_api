@@ -1,26 +1,35 @@
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
-import * as dotenv from 'dotenv';
+import { config as loadEnv } from 'dotenv';
+import { join } from 'path';
+import { DataSource, type DataSourceOptions } from 'typeorm';
 
-dotenv.config();
+loadEnv();
 
-console.log('===============================');
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_PORT:', process.env.DB_PORT);
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_PASS:', process.env.DB_PASS);
-console.log('DB_NAME:', process.env.DB_NAME);
-console.log('===============================');
+const dbHost = process.env.DB_HOST ?? 'localhost';
+const dbPortRaw = process.env.DB_PORT ?? '5432';
+const dbUser = process.env.DB_USER ?? 'postgres';
+const dbPassword = process.env.DB_PASS ?? 'postgres';
+const dbName = process.env.DB_NAME ?? 'vals_api';
 
-export const AppDataSource = new DataSource({
+const dbPort = Number(dbPortRaw);
+
+if (Number.isNaN(dbPort)) {
+  throw new Error(`Invalid DB_PORT value: "${dbPortRaw}"`);
+}
+
+export const appDataSourceOptions: DataSourceOptions = {
   type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT) || 5432,
-  username: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASS || 'postgres',
-  database: process.env.DB_NAME || 'vals_api',
-  entities: ['src/modules/**/*.entity{.ts,.js}'],
-  migrations: ['src/database/migrations/**/*{.ts,.js}'],
+  host: dbHost,
+  port: dbPort,
+  username: dbUser,
+  password: dbPassword,
+  database: dbName,
+  entities: [join(__dirname, 'modules/**/*.entity{.ts,.js}')],
+  migrations: [join(__dirname, 'database/migrations/*{.ts,.js}')],
   synchronize: false,
   logging: true,
-});
+};
+
+const appDataSource = new DataSource(appDataSourceOptions);
+
+export default appDataSource;

@@ -13,7 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true, // обязательно с nestjs-pino
   });
-
+  const allowed = process.env.APP_CORS_ORIGINS!.split(',');
   const config = app.get(ConfigService);
   const logger = app.get(Logger);
 
@@ -26,8 +26,7 @@ async function bootstrap() {
   app.use(compression());
 
   app.enableCors({
-    // origin: config.get<string>('app.corsOrigin'),
-    origin: true,
+    origin: [...allowed],
     credentials: true,
   });
 
