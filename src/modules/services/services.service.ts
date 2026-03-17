@@ -43,6 +43,9 @@ export class ServicesService extends BaseCrudService<
         faq: true,
         stages: true,
       },
+      order: {
+        id: 'ASC',
+      },
     });
   }
 
@@ -51,6 +54,7 @@ export class ServicesService extends BaseCrudService<
       .createQueryBuilder('service')
       .leftJoin('service.category', 'category')
       .select([...SERVICE_BASE_FIELDS, ...CATEGORY_FIELDS])
+      .orderBy('service.id', 'ASC')
       .getMany();
   }
 
@@ -58,6 +62,7 @@ export class ServicesService extends BaseCrudService<
     return this.repository.repository
       .createQueryBuilder('service')
       .select([...SERVICE_MAIN_FIELDS])
+      .orderBy('service.id', 'ASC')
       .getMany();
   }
 
@@ -113,6 +118,7 @@ export class ServicesService extends BaseCrudService<
       .leftJoin('service.faq', 'faq')
       .leftJoin('service.category', 'category')
       .select([...SERVICE_BASE_FIELDS, ...CATEGORY_FIELDS, ...FAQ_FIELDS])
+      .orderBy('service.id', 'ASC')
       .getMany();
   }
 

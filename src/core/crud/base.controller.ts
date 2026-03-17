@@ -44,7 +44,7 @@ export abstract class BaseCrudController<
   }
 
   @Post()
-  // @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Создать новый элемент' })
   @ApiCreatedResponse({ description: 'Элемент успешно создан' })
@@ -87,7 +87,7 @@ export abstract class BaseCrudController<
   }
 
   @Patch(':id')
-  // @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Обновить элемент по ID' })
   @ApiOkResponse({ description: 'Элемент обновлён' })
@@ -102,7 +102,7 @@ export abstract class BaseCrudController<
   }
 
   @Delete(':id')
-  // @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
+  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить элемент по ID' })
