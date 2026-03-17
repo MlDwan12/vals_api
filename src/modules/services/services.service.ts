@@ -45,6 +45,9 @@ export class ServicesService extends BaseCrudService<
       },
       order: {
         id: 'ASC',
+        stages: {
+          step: 'ASC',
+        },
       },
     });
   }
