@@ -35,6 +35,16 @@ export class CasesController extends BaseCrudController<
     }
   }
 
+  @Get('service/:slug')
+  async getCasesByServiceSlug(@Param('slug') slug: string) {
+    try {
+      return await this.service.getCasesByServiceSlug(slug);
+    } catch (e) {
+      console.error('REAL ERROR:', e);
+      throw e;
+    }
+  }
+
   @Get('info/case/:slug')
   @ApiOperation({ summary: 'Получить элемент по ID' })
   @ApiOkResponse({ description: 'Элемент найден' })

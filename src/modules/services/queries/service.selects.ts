@@ -37,6 +37,7 @@ export const CASES_MAIN_FIELDS = [
   'cases.description',
   'cases.problem',
   'cases.result',
+  'cases.industry',
   'cases.createdAt',
   'cases.updatedAt',
 ];

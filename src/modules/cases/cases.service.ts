@@ -17,6 +17,7 @@ import {
   CASES_MAIN_FIELDS,
   SERVICE_BASE_FIELDS,
 } from '../services/queries/service.selects';
+import { ServicesService } from '../services/services.service';
 
 type CaseRow = {
   id: number;
@@ -36,6 +37,7 @@ export class CasesService extends BaseCrudService<
   constructor(
     @InjectRepository(Case) private readonly repo: Repository<Case>,
     protected readonly logger: PinoLogger,
+    private readonly servicesService: ServicesService,
   ) {
     super(logger);
     this.repository = new CaseRepository(this.repo);
@@ -157,6 +159,17 @@ export class CasesService extends BaseCrudService<
     return this.repository.repository
       .createQueryBuilder('cases')
       .select([...CASES_MAIN_FIELDS])
+      .orderBy('cases.updatedAt', 'DESC')
+      .getMany();
+  }
+
+  async getCasesByServiceSlug(slug: string): Promise<Case[]> {
+    const service = await this.servicesService.findBySlug(slug);
+    return this.repository.repository
+      .createQueryBuilder('cases')
+      .innerJoin('cases.services', 'service')
+      .select([...CASES_MAIN_FIELDS])
+      .where('service.id = :id', { id: service.id })
       .orderBy('cases.updatedAt', 'DESC')
       .getMany();
   }

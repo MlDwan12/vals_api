@@ -50,6 +50,9 @@ export class CreateArticleDto {
   @IsObject()
   content: Record<string, any>;
 
+  @IsOptional()
+  contentHtml?: Record<string, unknown>;
+
   @ApiProperty({
     example: 'Как начать программировать — руководство',
     description: 'SEO заголовок',

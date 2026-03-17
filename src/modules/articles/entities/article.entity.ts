@@ -27,6 +27,9 @@ export class Article {
   @Column({ type: 'jsonb' })
   content: Record<string, any>;
 
+  @Column({ type: 'text', nullable: true })
+  contentHtml?: Record<string, any>;
+
   // SEO
   @Column({ type: 'varchar', length: 255, nullable: true })
   metaTitle: string;

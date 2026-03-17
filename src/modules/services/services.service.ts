@@ -115,6 +115,12 @@ export class ServicesService extends BaseCrudService<
     return service;
   }
 
+  async findBySlug(slug: string): Promise<Service> {
+    const service = await this.repository.findOne({ where: { slug } });
+    if (!service) throw new NotFoundException();
+    return service;
+  }
+
   getListServicesWithFaq(): Promise<Service[]> {
     return this.repository.repository
       .createQueryBuilder('service')
