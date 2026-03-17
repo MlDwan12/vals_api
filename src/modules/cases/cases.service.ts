@@ -63,6 +63,7 @@ export class CasesService extends BaseCrudService<
         problem: dto.problem,
         result: dto.result,
         content: dto.content,
+        contentHtml: dto.contentHtml,
         metaTitle: dto.metaTitle,
         metaDescription: dto.metaDescription,
         keywords: dto.keywords,
@@ -107,6 +108,7 @@ export class CasesService extends BaseCrudService<
         );
         existing.services = services;
       }
+      console.log('dto.contentHtml==========>', dto.contentHtml);
 
       // поля
       if (dto.industry) existing.industry = dto.industry;
@@ -116,6 +118,7 @@ export class CasesService extends BaseCrudService<
       if (dto.problem) existing.problem = dto.problem;
       if (dto.result) existing.result = dto.result;
       if (dto.content !== undefined) existing.content = dto.content;
+      if (dto.contentHtml !== undefined) existing.contentHtml = dto.contentHtml;
       if (dto.metaTitle !== undefined) existing.metaTitle = dto.metaTitle;
       if (dto.metaDescription !== undefined)
         existing.metaDescription = dto.metaDescription;
@@ -168,6 +171,7 @@ export class CasesService extends BaseCrudService<
         'cases.problem AS problem',
         'cases.result AS result',
         'cases.content AS content',
+        'cases.contentHtml AS contentHtml',
         'cases.metaTitle AS "metaTitle"',
         'cases.metaDescription AS "metaDescription"',
         'cases.keywords AS "keywords"',

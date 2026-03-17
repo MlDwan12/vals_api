@@ -53,6 +53,9 @@ export class CreateCaseDto {
   content?: Record<string, unknown>;
 
   @IsOptional()
+  contentHtml?: Record<string, unknown>;
+
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   metaTitle?: string;

@@ -51,6 +51,9 @@ export class Case {
   @Column({ type: 'jsonb', nullable: true })
   content?: Record<string, any>;
 
+  @Column({ type: 'text', nullable: true })
+  contentHtml?: Record<string, any>;
+
   // ===== SEO =====
   @Column({ type: 'varchar', length: 255, nullable: true })
   metaTitle?: string;
