@@ -54,6 +54,7 @@ export class CasesService extends BaseCrudService<
         serviceIds,
         services.map((s) => s.id),
       );
+      console.log('dto=================>', dto);
 
       const entity = em.getRepository(Case).create({
         industry: dto.industry,
@@ -69,6 +70,8 @@ export class CasesService extends BaseCrudService<
         keywords: dto.keywords,
         services,
       });
+
+      console.log('entity=============>', entity);
 
       const saved = await em.getRepository(Case).save(entity);
 
@@ -171,7 +174,7 @@ export class CasesService extends BaseCrudService<
         'cases.problem AS problem',
         'cases.result AS result',
         'cases.content AS content',
-        'cases.contentHtml AS contentHtml',
+        'cases.contentHtml AS "contentHtml"',
         'cases.metaTitle AS "metaTitle"',
         'cases.metaDescription AS "metaDescription"',
         'cases.keywords AS "keywords"',
