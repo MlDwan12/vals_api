@@ -78,7 +78,7 @@ export class Service {
   tariffs: Tariff[];
 
   // Кейсы
-  @OneToMany(() => Case, (c) => c.services)
+  @ManyToMany(() => Case, (c) => c.services)
   cases: Case[];
 
   // FAQ

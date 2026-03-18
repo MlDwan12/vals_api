@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceCategoriesService } from '../service_categories/service_categories.service';
 import { ServiceCategory } from '../service_categories/entities/service_category.entity';
 import {
+  CASES_MAIN_FIELDS,
   CATEGORY_FIELDS,
   FAQ_FIELDS,
   SERVICE_BASE_FIELDS,
@@ -93,6 +94,7 @@ export class ServicesService extends BaseCrudService<
       .createQueryBuilder('service')
       .leftJoin('service.category', 'category')
       .leftJoin('service.stages', 'stage')
+      .leftJoin('service.cases', 'cases')
       .leftJoin('service.tariffs', 'tariffs')
       .leftJoin('service.faq', 'faq')
       .select([
@@ -100,6 +102,7 @@ export class ServicesService extends BaseCrudService<
         ...CATEGORY_FIELDS,
         ...STAGE_FIELDS,
         ...TARIFF_FIELDS,
+        ...CASES_MAIN_FIELDS,
         ...FAQ_FIELDS,
       ])
       .where('service.slug = :slug', { slug })
