@@ -28,6 +28,7 @@ import { join } from 'path';
 import { ImageLibModule } from './modules/image-lib/image-lib.module';
 import { ClientModule } from './modules/client/client.module';
 import securityConfig from './config/security.config';
+import { SearchModule } from './modules/search/search.module';
 
 @Module({
   imports: [
@@ -105,6 +106,7 @@ import securityConfig from './config/security.config';
     ArticlesModule,
     ImageLibModule,
     ClientModule,
+    SearchModule,
   ],
   controllers: [],
   providers: [],

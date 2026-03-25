@@ -19,6 +19,8 @@ import {
   STAGE_FIELDS,
   TARIFF_FIELDS,
 } from './queries/service.selects';
+import { ServiceSearchDocumentBuilder } from '../search/builders/service-search-document.builder';
+import { SearchIndexService } from '../search/services/search-index.service';
 
 @Injectable()
 export class ServicesService extends BaseCrudService<
@@ -31,6 +33,8 @@ export class ServicesService extends BaseCrudService<
     @InjectRepository(Service) private readonly repo: Repository<Service>,
     protected readonly logger: PinoLogger,
     private readonly serviceCategoryService: ServiceCategoriesService,
+    private readonly serviceSearchDocumentBuilder: ServiceSearchDocumentBuilder,
+    private readonly searchIndexService: SearchIndexService,
   ) {
     super(logger);
     this.repository = new ServiceRepository(this.repo);
@@ -146,6 +150,28 @@ export class ServicesService extends BaseCrudService<
       ...rest,
       category,
     });
+
+    await this.searchIndexService.upsertDocument(
+      this.serviceSearchDocumentBuilder.build(entity),
+    );
     return entity;
+  }
+
+  async update(id: number, updateDto: UpdateServiceDto): Promise<Service> {
+    const service = await this.repository.update(id, updateDto);
+
+    await this.searchIndexService.upsertDocument(
+      this.serviceSearchDocumentBuilder.build(service!),
+    );
+
+    return service!;
+  }
+
+  async remove(id: number): Promise<void> {
+    const service = await this.findOneOrFail({ where: { id } });
+
+    await this.repository.delete(id);
+
+    await this.searchIndexService.deleteDocument(`service_${service.id}`);
   }
 }

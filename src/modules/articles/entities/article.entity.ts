@@ -28,7 +28,7 @@ export class Article {
   content: Record<string, any>;
 
   @Column({ type: 'text', nullable: true })
-  contentHtml?: Record<string, any>;
+  contentHtml: string | null;
 
   // SEO
   @Column({ type: 'varchar', length: 255, nullable: true })

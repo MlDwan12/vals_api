@@ -51,7 +51,7 @@ export class CreateArticleDto {
   content: Record<string, any>;
 
   @IsOptional()
-  contentHtml?: Record<string, unknown>;
+  contentHtml: string;
 
   @ApiProperty({
     example: 'Как начать программировать — руководство',

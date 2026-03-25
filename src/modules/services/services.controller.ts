@@ -1,4 +1,11 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import {
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -10,6 +17,8 @@ import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ServicesService } from './services.service';
 import { BaseCrudController } from 'src/core/crud/base.controller';
+import { ServiceSearchReindexService } from './services-search-reindex.service';
+import { ReindexResult } from '../search/interfaces/reindex-result.interface';
 
 @ApiTags('Услуги')
 @Controller('services')
@@ -20,7 +29,10 @@ export class ServicesController extends BaseCrudController<
 > {
   protected entityName: string;
 
-  constructor(protected readonly service: ServicesService) {
+  constructor(
+    protected readonly service: ServicesService,
+    private readonly serviceSearchReindexService: ServiceSearchReindexService,
+  ) {
     super(service);
   }
 
@@ -85,5 +97,11 @@ export class ServicesController extends BaseCrudController<
       console.error('REAL ERROR:', e);
       throw e;
     }
+  }
+
+  @Post('reindex')
+  @HttpCode(HttpStatus.OK)
+  async reindex(): Promise<ReindexResult> {
+    return this.serviceSearchReindexService.reindex();
   }
 }

@@ -53,7 +53,7 @@ export class CreateCaseDto {
   content?: Record<string, unknown>;
 
   @IsOptional()
-  contentHtml?: Record<string, unknown>;
+  contentHtml?: string | null;
 
   @IsOptional()
   @IsString()

@@ -118,10 +118,6 @@ export abstract class BaseCrudRepository<T extends { id: number }> {
     return this.repo.manager.transaction(fn);
   }
 
-  get orm(): Repository<T> {
-    return this.repo;
-  }
-
   get repository(): Repository<T> {
     return this.repo;
   }

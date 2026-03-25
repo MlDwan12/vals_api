@@ -17,6 +17,9 @@ import {
   ApiOkResponse,
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
+import { ArticleMainInfoDto } from './dto/article-main-info.dto';
+import { ArticleSearchReindexService } from './article-search-reindex.service';
+import { ReindexResult } from '../search/interfaces/reindex-result.interface';
 
 @Controller('articles')
 export class ArticlesController extends BaseCrudController<
@@ -24,20 +27,29 @@ export class ArticlesController extends BaseCrudController<
   CreateArticleDto,
   UpdateArticleDto
 > {
-  protected entityName: string;
+  protected entityName!: string;
 
-  constructor(protected readonly service: ArticlesService) {
+  constructor(
+    protected readonly service: ArticlesService,
+    private readonly articleSearchReindexService: ArticleSearchReindexService,
+  ) {
     super(service);
   }
 
+  @Post()
+  async create(@Body() dto: CreateArticleDto): Promise<Article> {
+    return this.service.createArticle(dto);
+  }
+
   @Get('all/main-info')
-  async getMainServiceInfoList() {
-    try {
-      return await this.service.findListArticleMainInfo();
-    } catch (e) {
-      console.error('REAL ERROR:', e);
-      throw e;
-    }
+  @ApiOperation({ summary: 'Получить список статей с основной информацией' })
+  @ApiOkResponse({
+    description: 'Список статей',
+    type: ArticleMainInfoDto,
+    isArray: true,
+  })
+  async getMainServiceInfoList(): Promise<ArticleMainInfoDto[]> {
+    return await this.service.findListArticleMainInfo();
   }
 
   @Get('info/:slug')
@@ -45,11 +57,11 @@ export class ArticlesController extends BaseCrudController<
   @ApiOkResponse({ description: 'Элемент найден' })
   @ApiNotFoundResponse({ description: 'Элемент не найден' })
   async getArticleInfo(@Param('slug') slug: string) {
-    try {
-      return await this.service.findOneOrFail({ where: { slug } });
-    } catch (e) {
-      console.error('REAL ERROR:', e);
-      throw e;
-    }
+    return await this.service.findBySlugOrFail(slug);
+  }
+
+  @Post('reindex')
+  async reindexArticles(): Promise<ReindexResult> {
+    return this.articleSearchReindexService.reindex();
   }
 }

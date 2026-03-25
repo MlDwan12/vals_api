@@ -32,7 +32,7 @@ export class ClientController extends BaseCrudController<
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
+  // @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
   async getListClient(
     @Query('page', new ParseIntPipe({ optional: true })) page = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit = 20,

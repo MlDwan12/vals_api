@@ -33,8 +33,8 @@ $ yarn run test:cov
 ## Migration
 
 ```bash
-# Создать новую миграцию имя миграции передается через --name
-yarn migration:create --name=AddAdminUser
+# Создать новую миграцию
+yarn migration:create src/database/migrations/Имя_миграции
 
 # Запустить миграции
 yarn migration:run

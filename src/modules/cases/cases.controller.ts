@@ -1,4 +1,11 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { CasesService } from './cases.service';
 import { CreateCaseDto } from './dto/create-case.dto';
 import { UpdateCaseDto } from './dto/update-case.dto';
@@ -11,6 +18,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BaseCrudController } from 'src/core/crud/base.controller';
+import { ReindexResult } from '../search/interfaces/reindex-result.interface';
+import { CaseSearchReindexService } from './case-search-reindex.service';
 
 @ApiTags('Кейсы')
 @Controller('cases')
@@ -21,7 +30,10 @@ export class CasesController extends BaseCrudController<
 > {
   protected entityName: string;
 
-  constructor(protected readonly service: CasesService) {
+  constructor(
+    protected readonly service: CasesService,
+    private readonly caseSearchReindexService: CaseSearchReindexService,
+  ) {
     super(service);
   }
 
@@ -52,5 +64,11 @@ export class CasesController extends BaseCrudController<
   @ApiBearerAuth()
   async findBySlug(@Param('slug') slug: string) {
     if (slug) return this.service.getCaseBySlug(slug);
+  }
+
+  @Post('reindex')
+  @HttpCode(HttpStatus.OK)
+  async reindexCases(): Promise<ReindexResult> {
+    return this.caseSearchReindexService.reindex();
   }
 }

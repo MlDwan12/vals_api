@@ -12,4 +12,14 @@ export class FaqRepository extends BaseCrudRepository<Faq> {
   ) {
     super(repo, Faq);
   }
+
+  async findBatchAfterId(lastId: number, limit: number): Promise<Faq[]> {
+    return this.repo
+      .createQueryBuilder('faq')
+      .leftJoinAndSelect('faq.service', 'service')
+      .where('faq.id > :lastId', { lastId })
+      .orderBy('faq.id', 'ASC')
+      .limit(limit)
+      .getMany();
+  }
 }

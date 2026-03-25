@@ -26,31 +26,49 @@ services:
     networks:
       - vals_network
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
 
-    container_name: vals_api
+  #   container_name: vals_api
+  #   restart: unless-stopped
+
+  #   env_file:
+  #     - .env
+
+  #   ports:
+  #     - '3000:3000'
+
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+  #   networks:
+  #     - vals_network
+
+  #   stop_grace_period: 30s
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: vals_meilisearch
     restart: unless-stopped
-
     env_file:
       - .env
-
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?MEILI_MASTER_KEY is required}
+      MEILI_ENV: production
+      MEILI_NO_ANALYTICS: 'true'
     ports:
-      - '3000:3000'
-
-    depends_on:
-      postgres:
-        condition: service_healthy
-
+      - '7700:7700'
+    volumes:
+      - meili_data:/meili_data
     networks:
       - vals_network
 
-    stop_grace_period: 30s
-
 volumes:
   postgres_data:
+  meili_data:
 
 networks:
   vals_network:

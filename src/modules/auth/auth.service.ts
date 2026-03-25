@@ -12,10 +12,7 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, password: string) {
-    console.log(username, password);
-
-    const user = await this.usersService.findOneOrFail({ where: { username } });
-    console.log(user);
+    const user = await this.usersService.findForAuth(username);
 
     if (!user) return null;
 
@@ -23,8 +20,8 @@ export class AuthService {
     return match ? user : null;
   }
 
-  async login(user: any) {
-    const payload = { sub: user.id, email: user.email };
+  async login(user: User) {
+    const payload = { sub: user.id, username: user.username, role: user.role };
 
     const accessToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,

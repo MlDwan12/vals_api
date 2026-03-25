@@ -18,6 +18,8 @@ import {
   SERVICE_BASE_FIELDS,
 } from '../services/queries/service.selects';
 import { ServicesService } from '../services/services.service';
+import { CaseSearchDocumentBuilder } from '../search/builders/case-search-document.builder';
+import { SearchIndexService } from '../search/services/search-index.service';
 
 type CaseRow = {
   id: number;
@@ -38,6 +40,8 @@ export class CasesService extends BaseCrudService<
     @InjectRepository(Case) private readonly repo: Repository<Case>,
     protected readonly logger: PinoLogger,
     private readonly servicesService: ServicesService,
+    private readonly caseSearchDocumentBuilder: CaseSearchDocumentBuilder,
+    private readonly searchIndexService: SearchIndexService,
   ) {
     super(logger);
     this.repository = new CaseRepository(this.repo);
@@ -56,7 +60,6 @@ export class CasesService extends BaseCrudService<
         serviceIds,
         services.map((s) => s.id),
       );
-      console.log('dto=================>', dto);
 
       const entity = em.getRepository(Case).create({
         industry: dto.industry,
@@ -73,10 +76,11 @@ export class CasesService extends BaseCrudService<
         services,
       });
 
-      console.log('entity=============>', entity);
-
       const saved = await em.getRepository(Case).save(entity);
 
+      await this.searchIndexService.upsertDocument(
+        this.caseSearchDocumentBuilder.build(saved),
+      );
       return em.getRepository(Case).findOneOrFail({
         where: { id: saved.id },
         relations: { services: true },
@@ -130,6 +134,15 @@ export class CasesService extends BaseCrudService<
       if (dto.keywords !== undefined) existing.keywords = dto.keywords;
 
       await caseRepo.save(existing);
+
+      await this.searchIndexService.upsertDocument(
+        this.caseSearchDocumentBuilder.build(
+          await caseRepo.findOneOrFail({
+            where: { id },
+            relations: { services: true },
+          })!,
+        ),
+      );
 
       return caseRepo.findOneOrFail({
         where: { id },
@@ -206,5 +219,13 @@ export class CasesService extends BaseCrudService<
       throw new NotFoundException(`${this.getEntityName()} not found`);
     }
     return row;
+  }
+
+  async remove(id: number): Promise<void> {
+    const caseEntity = await this.findOneOrFail({ where: { id } });
+
+    await this.repository.delete(id);
+
+    await this.searchIndexService.deleteDocument(`caseEntity_${caseEntity.id}`);
   }
 }

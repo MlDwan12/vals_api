@@ -11,25 +11,6 @@ export const SERVICE_BASE_FIELDS = [
   'service.createdAt',
 ];
 
-export const ARTICLE_BASE_FIELDS = [
-  'articles.id',
-  'articles.slug',
-  'articles.title',
-  'articles.description',
-  'articles.metaTitle',
-  'articles.metaDescription',
-  'articles.keywords',
-];
-
-export const ARTICLE_MAIN_FIELDS = [
-  'articles.id',
-  'articles.slug',
-  'articles.title',
-  'articles.description',
-  'articles.createdAt',
-  'articles.updatedAt',
-];
-
 export const CASES_MAIN_FIELDS = [
   'cases.id',
   'cases.slug',
@@ -72,7 +53,7 @@ export const TARIFF_FIELDS = [
   'tariffs.billingCycles',
   'tariffs.features',
   'tariffs.order_index',
-  'tariffs.basePrice'
+  'tariffs.basePrice',
 ];
 
 export const FAQ_FIELDS = ['faq.id', 'faq.question', 'faq.answer'];

@@ -39,7 +39,6 @@ export class AuthController {
       dto.username,
       dto.password,
     );
-    console.log(user);
 
     if (!user) throw new UnauthorizedException();
 
@@ -55,7 +54,7 @@ export class AuthController {
       sameSite: 'strict',
     });
 
-    return { login: user.username, role: 'admin' };
+    return { login: user.username, role: user.role };
   }
 
   @Get('me')
@@ -63,7 +62,7 @@ export class AuthController {
   async me(@Req() req: AuthRequest) {
     const user = await this.authService.getMe(req.user.id);
 
-    return { login: user.username, role: 'admin' };
+    return { login: user.username, role: user.role };
   }
 
   @Post('refresh')
