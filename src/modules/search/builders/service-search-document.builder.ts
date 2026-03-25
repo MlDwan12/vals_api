@@ -1,24 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { Service } from 'src/modules/services/entities/service.entity';
 import { GlobalSearchDocument } from '../interfaces/global-search-document.interface';
+import { SearchEntityType } from '../interfaces/searchable-entity-type.type';
 
 @Injectable()
 export class ServiceSearchDocumentBuilder {
   build(service: Service): GlobalSearchDocument {
     return {
       id: `service_${service.id}`,
-      entityType: 'service',
-      entityId: service.id,
+      entityType: SearchEntityType.service,
+      // entityId: service.id,
       title: service.title,
-      slug: service.slug,
+      // slug: service.slug,
       description: this.buildDescription(service),
-      content: this.buildSearchableContent(service),
-      category: service.category?.name ?? null,
-      tags: this.extractTags(service),
+      // content: this.buildSearchableContent(service),
+      // category: service.category?.name ?? null,
+      // tags: this.extractTags(service),
       url: `/services/${service.slug}`,
-      isPublished: true,
-      createdAt: service.createdAt.toISOString(),
-      updatedAt: service.updatedAt.toISOString(),
+      // isPublished: true,
+      // createdAt: service.createdAt.toISOString(),
+      // updatedAt: service.updatedAt.toISOString(),
     };
   }
 

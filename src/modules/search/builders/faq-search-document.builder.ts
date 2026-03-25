@@ -1,24 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { GlobalSearchDocument } from '../interfaces/global-search-document.interface';
 import { Faq } from 'src/modules/faq/entities/faq.entity';
+import { SearchEntityType } from '../interfaces/searchable-entity-type.type';
 
 @Injectable()
 export class FaqSearchDocumentBuilder {
   build(entity: Faq): GlobalSearchDocument {
     return {
       id: `faq_${entity.id}`,
-      entityType: 'faq',
-      entityId: entity.id,
+      entityType: SearchEntityType.faq,
+      // entityId: entity.id,
       title: entity.question,
-      slug: this.buildSlug(entity),
+      // slug: this.buildSlug(entity),
       description: this.buildDescription(entity.answer),
-      content: this.extractSearchableContent(entity),
-      category: 'faq',
-      tags: this.extractTags(entity),
+      // content: this.extractSearchableContent(entity),
+      // category: 'faq',
+      // tags: this.extractTags(entity),
       url: this.buildUrl(entity),
-      isPublished: true,
-      createdAt: entity.dateCreate.toISOString(),
-      updatedAt: entity.dateUpdate.toISOString(),
+      // isPublished: true,
+      // createdAt: entity.dateCreate.toISOString(),
+      // updatedAt: entity.dateUpdate.toISOString(),
     };
   }
 
@@ -65,7 +66,7 @@ export class FaqSearchDocumentBuilder {
 
   private buildUrl(entity: Faq): string {
     if (entity.service?.slug) {
-      return `/services/${entity.service.slug}#faq-${entity.id}`;
+      return `/services/${entity.service.slug}`;
     }
 
     return `/faq/${entity.id}`;
@@ -73,7 +74,7 @@ export class FaqSearchDocumentBuilder {
 
   private buildSlug(entity: Faq): string {
     if (entity.service?.slug) {
-      return `${entity.service.slug}-faq-${entity.id}`;
+      return `${entity.service.slug}`;
     }
 
     return `faq-${entity.id}`;

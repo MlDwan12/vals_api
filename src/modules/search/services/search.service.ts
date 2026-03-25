@@ -29,13 +29,13 @@ export class SearchService {
       (hit: GlobalSearchDocument) => ({
         id: hit.id,
         entityType: hit.entityType,
-        entityId: hit.entityId,
+        // entityId: hit.entityId,
         title: hit.title,
-        slug: hit.slug,
+        // slug: hit.slug,
         description: hit.description,
-        tags: hit.tags,
+        // tags: hit.tags,
         url: hit.url,
-        category: hit.category,
+        // category: hit.category,
       }),
     );
 

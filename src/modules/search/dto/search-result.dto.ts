@@ -3,12 +3,12 @@ import { SearchEntityType } from '../interfaces/searchable-entity-type.type';
 export interface SearchResultItemDto {
   id: string;
   entityType: SearchEntityType;
-  entityId: number;
+  // entityId: number;
   title: string;
-  slug: string;
+  // slug: string;
   description: string;
   url: string;
-  category: string | null;
+  // category: string | null;
 }
 
 export interface SearchResultDto {

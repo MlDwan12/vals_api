@@ -3,15 +3,15 @@ import { SearchEntityType } from './searchable-entity-type.type';
 export interface GlobalSearchDocument {
   id: string;
   entityType: SearchEntityType;
-  entityId: number;
+  // entityId: number;
   title: string;
-  slug: string;
+  // slug: string;
   description: string;
-  content: string;
-  category: string | null;
-  tags: string[];
+  // content: string;
+  // category: string | null;
+  // tags: string[];
   url: string;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
+  // isPublished: boolean;
+  // createdAt: string;
+  // updatedAt: string;
 }

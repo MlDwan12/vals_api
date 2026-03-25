@@ -1,24 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { GlobalSearchDocument } from '../interfaces/global-search-document.interface';
 import { Case } from 'src/modules/cases/entities/case.entity';
+import { SearchEntityType } from '../interfaces/searchable-entity-type.type';
 
 @Injectable()
 export class CaseSearchDocumentBuilder {
   build(entity: Case): GlobalSearchDocument {
     return {
       id: `case_${entity.id}`,
-      entityType: 'case',
-      entityId: entity.id,
+      entityType: SearchEntityType.case,
+      // entityId: entity.id,
       title: entity.title,
-      slug: entity.slug,
+      // slug: entity.slug,
       description: entity.description ?? '',
-      content: this.extractSearchableContent(entity),
-      category: this.extractCategory(entity),
-      tags: this.extractTags(entity),
+      // content: this.extractSearchableContent(entity),
+      // category: this.extractCategory(entity),
+      // tags: this.extractTags(entity),
       url: `/cases/${entity.slug}`,
-      isPublished: true,
-      createdAt: entity.createdAt.toISOString(),
-      updatedAt: entity.updatedAt.toISOString(),
+      // isPublished: true,
+      // createdAt: entity.createdAt.toISOString(),
+      // updatedAt: entity.updatedAt.toISOString(),
     };
   }
 

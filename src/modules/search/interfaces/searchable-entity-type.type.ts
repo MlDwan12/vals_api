@@ -1,8 +1,6 @@
-export type SearchEntityType =
-  | 'article'
-  | 'service'
-  | 'case'
-  | 'faq'
-  | 'industry'
-  | 'service_category'
-  | 'tariff';
+export enum SearchEntityType {
+  article = 'article',
+  faq = 'faq',
+  service = 'service',
+  case = 'case',
+}
