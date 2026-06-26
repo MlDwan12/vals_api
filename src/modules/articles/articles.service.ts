@@ -4,14 +4,12 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 import { Article } from './entities/article.entity';
 import { BaseCrudService } from 'src/core/crud/base.service';
 import { ArticleRepository } from './articles.repository';
-import { InjectRepository } from '@nestjs/typeorm';
 import { PinoLogger } from 'nestjs-pino';
-import { BaseCrudRepository } from 'src/core/crud/base.repository';
-import { Repository } from 'typeorm';
-import { ARTICLE_MAIN_FIELDS } from './queries/article.selects';
 import { ArticleMainInfoDto } from './dto/article-main-info.dto';
 import { ArticleSearchDocumentBuilder } from '../search/builders/article-search-document.builder';
 import { SearchIndexService } from '../search/services/search-index.service';
+import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
 @Injectable()
 export class ArticlesService extends BaseCrudService<
@@ -66,12 +64,25 @@ export class ArticlesService extends BaseCrudService<
     await this.searchIndexService.deleteDocument(`article_${article.id}`);
   }
 
-  async findListArticleMainInfo(): Promise<ArticleMainInfoDto[]> {
-    return this.repository.findMainInfoList();
+  async findListArticleMainInfo(
+    query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<ArticleMainInfoDto>> {
+    return this.repository.findMainInfoList(query);
   }
 
   async findBySlugOrFail(slug: string): Promise<Article> {
     const article = await this.repository.findBySlug(slug);
+
+    if (!article) {
+      throw new NotFoundException(`Статья со slug "${slug}" не найдена`);
+    }
+
+    return article;
+  }
+
+  /** Публичный эндпоинт сайта — только опубликованные (datePublished <= now) */
+  async findPublishedBySlugOrFail(slug: string): Promise<Article> {
+    const article = await this.repository.findBySlugPublished(slug);
 
     if (!article) {
       throw new NotFoundException(`Статья со slug "${slug}" не найдена`);

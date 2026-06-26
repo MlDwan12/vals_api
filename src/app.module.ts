@@ -26,6 +26,7 @@ import { ArticlesModule } from './modules/articles/articles.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ImageLibModule } from './modules/image-lib/image-lib.module';
+import { MediaModule } from './modules/media/media.module';
 import { ClientModule } from './modules/client/client.module';
 import securityConfig from './config/security.config';
 import { SearchModule } from './modules/search/search.module';
@@ -105,6 +106,7 @@ import { SearchModule } from './modules/search/search.module';
     AuthModule,
     ArticlesModule,
     ImageLibModule,
+    MediaModule,
     ClientModule,
     SearchModule,
   ],

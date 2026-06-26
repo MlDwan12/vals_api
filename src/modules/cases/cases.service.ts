@@ -13,13 +13,13 @@ import { BaseCrudRepository } from 'src/core/crud/base.repository';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Service } from '../services/entities/service.entity';
-import {
-  CASES_MAIN_FIELDS,
-  SERVICE_BASE_FIELDS,
-} from '../services/queries/service.selects';
+import { CASES_MAIN_FIELDS } from '../services/queries/service.selects';
 import { ServicesService } from '../services/services.service';
 import { CaseSearchDocumentBuilder } from '../search/builders/case-search-document.builder';
 import { SearchIndexService } from '../search/services/search-index.service';
+import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { SortByDate } from 'src/shared/enums/sort-by-date.enum';
+import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
 type CaseRow = {
   id: number;
@@ -73,6 +73,8 @@ export class CasesService extends BaseCrudService<
         metaTitle: dto.metaTitle,
         metaDescription: dto.metaDescription,
         keywords: dto.keywords,
+        datePublished: dto.datePublished ? new Date(dto.datePublished) : null,
+        priority: dto.priority ?? 0,
         services,
       });
 
@@ -117,8 +119,6 @@ export class CasesService extends BaseCrudService<
         );
         existing.services = services;
       }
-      console.log('dto.contentHtml==========>', dto.contentHtml);
-
       // поля
       if (dto.industry) existing.industry = dto.industry;
       if (dto.title) existing.title = dto.title;
@@ -132,6 +132,8 @@ export class CasesService extends BaseCrudService<
       if (dto.metaDescription !== undefined)
         existing.metaDescription = dto.metaDescription;
       if (dto.keywords !== undefined) existing.keywords = dto.keywords;
+      if ('datePublished' in dto) existing.datePublished = dto.datePublished ? new Date(dto.datePublished) : null;
+      if (dto.priority !== undefined) existing.priority = dto.priority;
 
       await caseRepo.save(existing);
 
@@ -168,14 +170,45 @@ export class CasesService extends BaseCrudService<
     throw new BadRequestException(`Services not found: ${missing.join(', ')}`);
   }
 
-  async findListCaseMainInfo(): Promise<Case[]> {
-    return this.repository.repository
+  async findListCaseMainInfo(
+    query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<Case>> {
+    const { page, limit, search, sortBy } = query;
+
+    const sortMap: Record<SortByDate, { column: string; direction: 'ASC' | 'DESC' }> = {
+      [SortByDate.UPDATED_DESC]:   { column: 'cases.updatedAt',     direction: 'DESC' },
+      [SortByDate.UPDATED_ASC]:    { column: 'cases.updatedAt',     direction: 'ASC'  },
+      [SortByDate.CREATED_DESC]:   { column: 'cases.createdAt',     direction: 'DESC' },
+      [SortByDate.CREATED_ASC]:    { column: 'cases.createdAt',     direction: 'ASC'  },
+      [SortByDate.PUBLISHED_DESC]: { column: 'cases.datePublished', direction: 'DESC' },
+      [SortByDate.PUBLISHED_ASC]:  { column: 'cases.datePublished', direction: 'ASC'  },
+    };
+
+    const sort = sortBy ? sortMap[sortBy] : sortMap[SortByDate.UPDATED_DESC];
+
+    const qb = this.repository.repository
       .createQueryBuilder('cases')
       .select([...CASES_MAIN_FIELDS])
-      .orderBy('cases.updatedAt', 'DESC')
-      .getMany();
+      .orderBy(sort.column, sort.direction)
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    if (search) {
+      qb.where('cases.title ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      items,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
+  /** Публичный эндпоинт сайта — только опубликованные, приоритетная сортировка */
   async getCasesByServiceSlug(slug: string): Promise<Case[]> {
     const service = await this.servicesService.findBySlug(slug);
     return this.repository.repository
@@ -183,10 +216,15 @@ export class CasesService extends BaseCrudService<
       .innerJoin('cases.services', 'service')
       .select([...CASES_MAIN_FIELDS])
       .where('service.id = :id', { id: service.id })
-      .orderBy('cases.updatedAt', 'DESC')
+      .andWhere('cases.datePublished IS NOT NULL')
+      .andWhere('cases.datePublished <= :now', { now: new Date() })
+      .orderBy('cases.priority', 'DESC')
+      .addOrderBy('cases.datePublished', 'DESC')
+      .addOrderBy('cases.id', 'DESC')
       .getMany();
   }
 
+  /** Публичный эндпоинт сайта — только опубликованный кейс */
   async getCaseBySlug(slug: string): Promise<CaseRow> {
     const row = await this.repository.repository
       .createQueryBuilder('cases')
@@ -204,6 +242,7 @@ export class CasesService extends BaseCrudService<
         'cases.metaTitle AS "metaTitle"',
         'cases.metaDescription AS "metaDescription"',
         'cases.keywords AS "keywords"',
+        'cases.date_published AS "datePublished"',
         'cases.created_at AS "createdAt"',
         'cases.updated_at AS "updatedAt"',
       ])
@@ -212,6 +251,8 @@ export class CasesService extends BaseCrudService<
         'serviceIds',
       )
       .where('cases.slug = :slug', { slug })
+      .andWhere('cases.datePublished IS NOT NULL')
+      .andWhere('cases.datePublished <= :now', { now: new Date() })
       .groupBy('cases.id')
       .getRawOne();
 

@@ -40,6 +40,12 @@ export class Article {
   @Column({ type: 'varchar', length: 255, nullable: true })
   keywords: string;
 
+  @Column({ type: 'timestamptz', nullable: true, name: 'date_published', default: null })
+  datePublished: Date | null;
+
+  @Column({ type: 'int', default: 0 })
+  priority: number;
+
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 

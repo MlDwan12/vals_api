@@ -1,10 +1,13 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
   MaxLength,
   IsOptional,
   IsObject,
+  IsDateString,
+  IsInt,
+  Min,
 } from 'class-validator';
 
 export class CreateArticleDto {
@@ -80,4 +83,18 @@ export class CreateArticleDto {
   @IsString()
   @IsOptional()
   keywords?: string;
+
+  @ApiPropertyOptional({
+    example: '2026-07-01T00:00:00.000Z',
+    description: 'Дата публикации. null — черновик, будущая дата — запланированная, прошедшая — опубликованная',
+  })
+  @IsOptional()
+  @IsDateString()
+  datePublished?: string | null;
+
+  @ApiPropertyOptional({ example: 0, description: 'Приоритет (чем выше — тем выше в списке)' })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  priority?: number;
 }

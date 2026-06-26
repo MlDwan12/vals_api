@@ -5,6 +5,9 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiNotFoundResponse,
@@ -19,6 +22,8 @@ import { ServicesService } from './services.service';
 import { BaseCrudController } from 'src/core/crud/base.controller';
 import { ServiceSearchReindexService } from './services-search-reindex.service';
 import { ReindexResult } from '../search/interfaces/reindex-result.interface';
+import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
 @ApiTags('Услуги')
 @Controller('services')
@@ -57,9 +62,12 @@ export class ServicesController extends BaseCrudController<
   }
 
   @Get('all/main-info')
-  async getMainServiceInfoList() {
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getMainServiceInfoList(
+    @Query() query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<Service>> {
     try {
-      return await this.service.findListServiceMainInfo();
+      return await this.service.findListServiceMainInfo(query);
     } catch (e) {
       console.error('REAL ERROR:', e);
       throw e;

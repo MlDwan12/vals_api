@@ -21,6 +21,9 @@ import {
 } from './queries/service.selects';
 import { ServiceSearchDocumentBuilder } from '../search/builders/service-search-document.builder';
 import { SearchIndexService } from '../search/services/search-index.service';
+import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { SortByDate } from 'src/shared/enums/sort-by-date.enum';
+import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
 @Injectable()
 export class ServicesService extends BaseCrudService<
@@ -66,12 +69,42 @@ export class ServicesService extends BaseCrudService<
       .getMany();
   }
 
-  async findListServiceMainInfo(): Promise<Service[]> {
-    return this.repository.repository
+  async findListServiceMainInfo(
+    query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<Service>> {
+    const { page, limit, search, sortBy } = query;
+
+    const sortMap: Record<SortByDate, { column: string; direction: 'ASC' | 'DESC' }> = {
+      [SortByDate.UPDATED_DESC]:   { column: 'service.updatedAt', direction: 'DESC' },
+      [SortByDate.UPDATED_ASC]:    { column: 'service.updatedAt', direction: 'ASC'  },
+      [SortByDate.CREATED_DESC]:   { column: 'service.createdAt', direction: 'DESC' },
+      [SortByDate.CREATED_ASC]:    { column: 'service.createdAt', direction: 'ASC'  },
+      [SortByDate.PUBLISHED_DESC]: { column: 'service.createdAt', direction: 'DESC' },
+      [SortByDate.PUBLISHED_ASC]:  { column: 'service.createdAt', direction: 'ASC'  },
+    };
+
+    const sort = sortBy ? sortMap[sortBy] : sortMap[SortByDate.CREATED_DESC];
+
+    const qb = this.repository.repository
       .createQueryBuilder('service')
       .select([...SERVICE_MAIN_FIELDS])
-      .orderBy('service.id', 'ASC')
-      .getMany();
+      .orderBy(sort.column, sort.direction)
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    if (search) {
+      qb.where('service.title ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      items,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findListServiceFullInfo(): Promise<Service[]> {
@@ -98,7 +131,12 @@ export class ServicesService extends BaseCrudService<
       .createQueryBuilder('service')
       .leftJoin('service.category', 'category')
       .leftJoin('service.stages', 'stage')
-      .leftJoin('service.cases', 'cases')
+      .leftJoin(
+        'service.cases',
+        'cases',
+        'cases.datePublished IS NOT NULL AND cases.datePublished <= :now',
+        { now: new Date() },
+      )
       .leftJoin('service.tariffs', 'tariffs')
       .leftJoin('service.faq', 'faq')
       .select([

@@ -1,0 +1,1266 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-06-26T00:00:00.000Z",
+  "__export_source": "vals_api",
+  "resources": [
+    {
+      "_id": "wrk_vals",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "Vals API",
+      "description": "Vals API — полная коллекция эндпоинтов"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_vals",
+      "name": "Local",
+      "data": {
+        "base_url": "http://localhost:3000"
+      },
+      "color": "#4CAF50",
+      "isPrivate": false
+    },
+
+    { "_id": "fld_auth",               "_type": "request_group", "parentId": "wrk_vals", "name": "Auth" },
+    { "_id": "fld_articles",           "_type": "request_group", "parentId": "wrk_vals", "name": "Articles" },
+    { "_id": "fld_cases",              "_type": "request_group", "parentId": "wrk_vals", "name": "Cases" },
+    { "_id": "fld_services",           "_type": "request_group", "parentId": "wrk_vals", "name": "Services" },
+    { "_id": "fld_service_categories", "_type": "request_group", "parentId": "wrk_vals", "name": "Service Categories" },
+    { "_id": "fld_service_steps",      "_type": "request_group", "parentId": "wrk_vals", "name": "Service Steps" },
+    { "_id": "fld_tariffs",            "_type": "request_group", "parentId": "wrk_vals", "name": "Tariffs" },
+    { "_id": "fld_tariff_periods",     "_type": "request_group", "parentId": "wrk_vals", "name": "Tariff Periods" },
+    { "_id": "fld_faq",                "_type": "request_group", "parentId": "wrk_vals", "name": "FAQ" },
+    { "_id": "fld_industry",           "_type": "request_group", "parentId": "wrk_vals", "name": "Industry" },
+    { "_id": "fld_users",              "_type": "request_group", "parentId": "wrk_vals", "name": "Users" },
+    { "_id": "fld_clients",            "_type": "request_group", "parentId": "wrk_vals", "name": "Clients" },
+    { "_id": "fld_client_leads",       "_type": "request_group", "parentId": "wrk_vals", "name": "Client Leads" },
+    { "_id": "fld_client_contacts",    "_type": "request_group", "parentId": "wrk_vals", "name": "Client Contacts" },
+    { "_id": "fld_image_lib",          "_type": "request_group", "parentId": "wrk_vals", "name": "Image Library" },
+    { "_id": "fld_search",             "_type": "request_group", "parentId": "wrk_vals", "name": "Search" },
+    { "_id": "fld_bitrix",             "_type": "request_group", "parentId": "wrk_vals", "name": "Bitrix" },
+    { "_id": "fld_media",              "_type": "request_group", "parentId": "wrk_vals", "name": "Media" },
+
+    {
+      "_id": "req_auth_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Login",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/login",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"admin\",\n  \"password\": \"password123\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_auth_me",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Get Current User",
+      "method": "GET",
+      "url": "{{ base_url }}/auth/me",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_auth_refresh",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Refresh Tokens",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/refresh",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_auth_logout",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Logout",
+      "method": "GET",
+      "url": "{{ base_url }}/auth/logout",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_articles_main_info",
+      "_type": "request",
+      "parentId": "fld_articles",
+      "name": "List Main Info (admin)",
+      "method": "GET",
+      "url": "{{ base_url }}/articles/all/main-info",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",   "value": "1",             "disabled": false },
+        { "name": "limit",  "value": "20",            "disabled": false },
+        { "name": "search", "value": "заголовок",     "disabled": true },
+        { "name": "sortBy", "value": "updated_desc",  "disabled": true },
+        { "name": "sortBy", "value": "updated_asc",   "disabled": true },
+        { "name": "sortBy", "value": "created_desc",  "disabled": true },
+        { "name": "sortBy", "value": "created_asc",   "disabled": true },
+        { "name": "sortBy", "value": "published_desc","disabled": true },
+        { "name": "sortBy", "value": "published_asc", "disabled": true }
+      ]
+    },
+    {
+      "_id": "req_articles_by_slug",
+      "_type": "request",
+      "parentId": "fld_articles",
+      "name": "Get by Slug (сайт — только опубликованные)",
+      "method": "GET",
+      "url": "{{ base_url }}/articles/info/my-article-slug",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_articles_paginate",
+      "_type": "request",
+      "parentId": "fld_articles",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/articles",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_articles_by_id",
+      "_type": "request",
+      "parentId": "fld_articles",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/articles/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_articles_create",
+      "_type": "request",
+      "parentId": "fld_articles",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/articles",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"slug\": \"my-article-slug\",\n  \"title\": \"Заголовок статьи\",\n  \"description\": \"Описание статьи для карточки\",\n  \"content\": {\n    \"type\": \"doc\",\n    \"content\": [\n      {\n        \"type\": \"paragraph\",\n        \"content\": [{ \"type\": \"text\", \"text\": \"Текст статьи\" }]\n      }\n    ]\n  },\n  \"contentHtml\": \"<p>Текст статьи</p>\",\n  \"metaTitle\": \"SEO заголовок\",\n  \"metaDescription\": \"SEO описание\",\n  \"keywords\": \"ключевые слова, через запятую\",\n  \"datePublished\": null,\n  \"priority\": 0\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_articles_update",
+      "_type": "request",
+      "parentId": "fld_articles",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/articles/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Обновлённый заголовок\",\n  \"datePublished\": \"2026-07-01T00:00:00.000Z\",\n  \"priority\": 0\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_articles_delete",
+      "_type": "request",
+      "parentId": "fld_articles",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/articles/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_articles_reindex",
+      "_type": "request",
+      "parentId": "fld_articles",
+      "name": "Reindex",
+      "method": "POST",
+      "url": "{{ base_url }}/articles/reindex",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_cases_main_info",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "List Main Info (admin)",
+      "method": "GET",
+      "url": "{{ base_url }}/cases/all/main-info",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",   "value": "1",             "disabled": false },
+        { "name": "limit",  "value": "20",            "disabled": false },
+        { "name": "search", "value": "кейс",          "disabled": true },
+        { "name": "sortBy", "value": "updated_desc",  "disabled": true },
+        { "name": "sortBy", "value": "updated_asc",   "disabled": true },
+        { "name": "sortBy", "value": "created_desc",  "disabled": true },
+        { "name": "sortBy", "value": "created_asc",   "disabled": true },
+        { "name": "sortBy", "value": "published_desc","disabled": true },
+        { "name": "sortBy", "value": "published_asc", "disabled": true }
+      ]
+    },
+    {
+      "_id": "req_cases_by_service_slug",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "Get by Service Slug (сайт — только опубликованные)",
+      "method": "GET",
+      "url": "{{ base_url }}/cases/service/orm",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_cases_by_slug",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "Get by Slug (сайт — только опубликованные)",
+      "method": "GET",
+      "url": "{{ base_url }}/cases/info/case/vosstanovlenie-reputacii-internet-magazina",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_cases_paginate",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/cases",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_cases_by_id",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/cases/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_cases_create",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/cases",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"serviceIds\": [1],\n  \"industry\": [\"IT\"],\n  \"title\": \"Название кейса\",\n  \"slug\": \"case-slug\",\n  \"description\": \"Краткое описание кейса\",\n  \"problem\": \"Описание проблемы клиента\",\n  \"result\": \"Достигнутый результат\",\n  \"content\": null,\n  \"contentHtml\": null,\n  \"metaTitle\": \"SEO заголовок\",\n  \"metaDescription\": \"SEO описание\",\n  \"keywords\": \"ключевые слова\",\n  \"datePublished\": null,\n  \"priority\": 0\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_cases_update",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/cases/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Обновлённое название кейса\",\n  \"datePublished\": \"2026-07-01T00:00:00.000Z\",\n  \"priority\": 0\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_cases_delete",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/cases/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_cases_reindex",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "Reindex",
+      "method": "POST",
+      "url": "{{ base_url }}/cases/reindex",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_services_main_info",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "List Main Info (admin)",
+      "method": "GET",
+      "url": "{{ base_url }}/services/all/main-info",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",   "value": "1",             "disabled": false },
+        { "name": "limit",  "value": "20",            "disabled": false },
+        { "name": "search", "value": "услуга",        "disabled": true },
+        { "name": "sortBy", "value": "updated_desc",  "disabled": true },
+        { "name": "sortBy", "value": "updated_asc",   "disabled": true },
+        { "name": "sortBy", "value": "created_desc",  "disabled": true },
+        { "name": "sortBy", "value": "created_asc",   "disabled": true },
+        { "name": "sortBy", "value": "published_desc","disabled": true },
+        { "name": "sortBy", "value": "published_asc", "disabled": true }
+      ]
+    },
+    {
+      "_id": "req_services_all_info",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "All With Relations",
+      "method": "GET",
+      "url": "{{ base_url }}/services/all/info",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_services_short_info",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "All Short Info",
+      "method": "GET",
+      "url": "{{ base_url }}/services/all/short-info",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_services_full_info",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "All Full Info",
+      "method": "GET",
+      "url": "{{ base_url }}/services/all/full-info",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_services_faq",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "List With FAQ",
+      "method": "GET",
+      "url": "{{ base_url }}/services/list/faq",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_services_by_slug",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "Get by Slug",
+      "method": "GET",
+      "url": "{{ base_url }}/services/info/website-development",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_services_paginate",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/services",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_services_by_id",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/services/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_services_create",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/services",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"slug\": \"service-slug\",\n  \"categoryId\": 1,\n  \"title\": \"Название услуги\",\n  \"subtitle\": \"Подзаголовок услуги\",\n  \"description\": \"Полное описание услуги\",\n  \"subDescription\": \"Дополнительное описание\",\n  \"list\": [\"Преимущество 1\", \"Преимущество 2\", \"Преимущество 3\"],\n  \"icon\": \"icon.svg\",\n  \"backgroundColor\": \"blue\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_services_update",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/services/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Обновлённое название услуги\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_services_delete",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/services/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_services_reindex",
+      "_type": "request",
+      "parentId": "fld_services",
+      "name": "Reindex",
+      "method": "POST",
+      "url": "{{ base_url }}/services/reindex",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_svc_cat_list",
+      "_type": "request",
+      "parentId": "fld_service_categories",
+      "name": "List All",
+      "method": "GET",
+      "url": "{{ base_url }}/service-categories",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_svc_cat_by_id",
+      "_type": "request",
+      "parentId": "fld_service_categories",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/service-categories/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_svc_cat_create",
+      "_type": "request",
+      "parentId": "fld_service_categories",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/service-categories",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Веб-разработка\",\n  \"description\": \"Категория услуг по разработке сайтов\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_svc_cat_update",
+      "_type": "request",
+      "parentId": "fld_service_categories",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/service-categories/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Обновлённое название\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_svc_cat_delete",
+      "_type": "request",
+      "parentId": "fld_service_categories",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/service-categories/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_svc_steps_paginate",
+      "_type": "request",
+      "parentId": "fld_service_steps",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/service-steps",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_svc_steps_by_id",
+      "_type": "request",
+      "parentId": "fld_service_steps",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/service-steps/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_svc_steps_create",
+      "_type": "request",
+      "parentId": "fld_service_steps",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/service-steps",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"serviceId\": 1,\n  \"step\": 1,\n  \"title\": \"Анализ требований\",\n  \"description\": \"Изучаем требования проекта\",\n  \"time\": \"1-2 дня\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_svc_steps_update",
+      "_type": "request",
+      "parentId": "fld_service_steps",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/service-steps/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Обновлённый заголовок шага\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_svc_steps_delete",
+      "_type": "request",
+      "parentId": "fld_service_steps",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/service-steps/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_tariffs_paginate",
+      "_type": "request",
+      "parentId": "fld_tariffs",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/tariffs",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_tariffs_by_id",
+      "_type": "request",
+      "parentId": "fld_tariffs",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/tariffs/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_tariffs_create",
+      "_type": "request",
+      "parentId": "fld_tariffs",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/tariffs",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"serviceId\": 1,\n  \"name\": \"Базовый\",\n  \"from\": \"Для малого бизнеса\",\n  \"features\": \"Мониторинг упоминаний||Размещение отзывов||Аналитика\",\n  \"is_popular\": false,\n  \"order_index\": 0,\n  \"basePrice\": 50000,\n  \"periodsIds\": [1, 2]\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_tariffs_update",
+      "_type": "request",
+      "parentId": "fld_tariffs",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/tariffs/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Обновлённый тариф\",\n  \"basePrice\": 60000\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_tariffs_delete",
+      "_type": "request",
+      "parentId": "fld_tariffs",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/tariffs/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_tariff_periods_list",
+      "_type": "request",
+      "parentId": "fld_tariff_periods",
+      "name": "List All",
+      "method": "GET",
+      "url": "{{ base_url }}/tariff-periods",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_tariff_periods_by_id",
+      "_type": "request",
+      "parentId": "fld_tariff_periods",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/tariff-periods/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_tariff_periods_create",
+      "_type": "request",
+      "parentId": "fld_tariff_periods",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/tariff-periods",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"months\": 12,\n  \"basePrice\": 1000,\n  \"discountPercent\": 10\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_tariff_periods_update",
+      "_type": "request",
+      "parentId": "fld_tariff_periods",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/tariff-periods/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"discountPercent\": 15\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_tariff_periods_delete",
+      "_type": "request",
+      "parentId": "fld_tariff_periods",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/tariff-periods/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_faq_paginate",
+      "_type": "request",
+      "parentId": "fld_faq",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/faq",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_faq_by_id",
+      "_type": "request",
+      "parentId": "fld_faq",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/faq/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_faq_create",
+      "_type": "request",
+      "parentId": "fld_faq",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/faq",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"serviceId\": 1,\n  \"question\": \"Как это работает?\",\n  \"answer\": \"Это работает следующим образом...\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_faq_update",
+      "_type": "request",
+      "parentId": "fld_faq",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/faq/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"answer\": \"Обновлённый ответ\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_faq_delete",
+      "_type": "request",
+      "parentId": "fld_faq",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/faq/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_faq_reindex",
+      "_type": "request",
+      "parentId": "fld_faq",
+      "name": "Reindex",
+      "method": "POST",
+      "url": "{{ base_url }}/faq/reindex",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_industry_paginate",
+      "_type": "request",
+      "parentId": "fld_industry",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/industry",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_industry_by_id",
+      "_type": "request",
+      "parentId": "fld_industry",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/industry/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_industry_create",
+      "_type": "request",
+      "parentId": "fld_industry",
+      "name": "Create",
+      "method": "POST",
+      "url": "{{ base_url }}/industry",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"IT\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_industry_update",
+      "_type": "request",
+      "parentId": "fld_industry",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/industry/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"FinTech\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_industry_delete",
+      "_type": "request",
+      "parentId": "fld_industry",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/industry/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_users_paginate",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/users",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_users_by_id",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/users/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_users_create",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Create User",
+      "method": "POST",
+      "url": "{{ base_url }}/users",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"new_user\",\n  \"password\": \"Password123!\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_users_create_moderator",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Create Moderator (admin only)",
+      "method": "POST",
+      "url": "{{ base_url }}/users/moderators",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"new_moderator\",\n  \"password\": \"Password123!\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_users_update",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/users/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"password\": \"NewPassword456!\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_users_delete",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/users/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_clients_list",
+      "_type": "request",
+      "parentId": "fld_clients",
+      "name": "List Clients",
+      "method": "GET",
+      "url": "{{ base_url }}/client",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",   "value": "1",         "disabled": false },
+        { "name": "limit",  "value": "20",        "disabled": false },
+        { "name": "search", "value": "+79001234", "disabled": true }
+      ]
+    },
+    {
+      "_id": "req_clients_by_id",
+      "_type": "request",
+      "parentId": "fld_clients",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/client/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_clients_update",
+      "_type": "request",
+      "parentId": "fld_clients",
+      "name": "Update",
+      "method": "PATCH",
+      "url": "{{ base_url }}/client/1",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Обновлённое имя клиента\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_clients_delete",
+      "_type": "request",
+      "parentId": "fld_clients",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/client/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_leads_paginate",
+      "_type": "request",
+      "parentId": "fld_client_leads",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/client-leads",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",     "value": "1",                  "disabled": false },
+        { "name": "limit",    "value": "20",                 "disabled": false },
+        { "name": "clientId", "value": "1",                  "disabled": true },
+        { "name": "type",     "value": "FREE_CONSULTATION",  "disabled": true }
+      ]
+    },
+    {
+      "_id": "req_leads_by_id",
+      "_type": "request",
+      "parentId": "fld_client_leads",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/client-leads/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_leads_by_client",
+      "_type": "request",
+      "parentId": "fld_client_leads",
+      "name": "Get by Client ID",
+      "method": "GET",
+      "url": "{{ base_url }}/client-leads/client/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_contacts_paginate",
+      "_type": "request",
+      "parentId": "fld_client_contacts",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/client-contacts",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",     "value": "1",     "disabled": false },
+        { "name": "limit",    "value": "20",    "disabled": false },
+        { "name": "clientId", "value": "1",     "disabled": true },
+        { "name": "type",     "value": "PHONE", "disabled": true }
+      ]
+    },
+    {
+      "_id": "req_contacts_by_id",
+      "_type": "request",
+      "parentId": "fld_client_contacts",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/client-contacts/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_contacts_by_client",
+      "_type": "request",
+      "parentId": "fld_client_contacts",
+      "name": "Get by Client ID",
+      "method": "GET",
+      "url": "{{ base_url }}/client-contacts/client/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_image_lib_all",
+      "_type": "request",
+      "parentId": "fld_image_lib",
+      "name": "Get All",
+      "method": "GET",
+      "url": "{{ base_url }}/image-lib/all",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_image_lib_paginate",
+      "_type": "request",
+      "parentId": "fld_image_lib",
+      "name": "Paginate",
+      "method": "GET",
+      "url": "{{ base_url }}/image-lib",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",  "value": "1",  "disabled": false },
+        { "name": "limit", "value": "20", "disabled": false }
+      ]
+    },
+    {
+      "_id": "req_image_lib_by_id",
+      "_type": "request",
+      "parentId": "fld_image_lib",
+      "name": "Get by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/image-lib/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_image_lib_upload",
+      "_type": "request",
+      "parentId": "fld_image_lib",
+      "name": "Upload Images",
+      "method": "POST",
+      "url": "{{ base_url }}/image-lib/upload",
+      "headers": [],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "images",
+            "value": "",
+            "type": "file",
+            "disabled": false,
+            "description": "До 10 файлов: jpeg, png, webp, gif, avif (макс 5MB)"
+          }
+        ]
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_image_lib_delete",
+      "_type": "request",
+      "parentId": "fld_image_lib",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/image-lib/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "req_search",
+      "_type": "request",
+      "parentId": "fld_search",
+      "name": "Search",
+      "method": "GET",
+      "url": "{{ base_url }}/search",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "q",     "value": "разработка сайта", "disabled": false },
+        { "name": "page",  "value": "1",                "disabled": false },
+        { "name": "limit", "value": "10",               "disabled": true }
+      ]
+    },
+
+    {
+      "_id": "req_bitrix_create",
+      "_type": "request",
+      "parentId": "fld_bitrix",
+      "name": "Create Lead — Free Consultation",
+      "method": "POST",
+      "url": "{{ base_url }}/bitrix",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Иван Петров\",\n  \"phone\": \"+79001234567\",\n  \"type\": \"FREE_CONSULTATION\",\n  \"message\": \"Хочу узнать подробнее об услуге\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_bitrix_create_tariff",
+      "_type": "request",
+      "parentId": "fld_bitrix",
+      "name": "Create Lead — Tariff Request",
+      "method": "POST",
+      "url": "{{ base_url }}/bitrix",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Иван Петров\",\n  \"phone\": \"+79001234567\",\n  \"type\": \"TARIFF_REQUEST\",\n  \"email\": \"ivan@example.com\",\n  \"comment\": \"Интересует тариф на 6 месяцев\",\n  \"tariffId\": 1,\n  \"periodId\": 2\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_bitrix_create_audit",
+      "_type": "request",
+      "parentId": "fld_bitrix",
+      "name": "Create Lead — Free Audit",
+      "method": "POST",
+      "url": "{{ base_url }}/bitrix",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Иван Петров\",\n  \"phone\": \"+79001234567\",\n  \"type\": \"FREE_AUDIT\"\n}"
+      },
+      "parameters": []
+    },
+
+    {
+      "_id": "req_media_list",
+      "_type": "request",
+      "parentId": "fld_media",
+      "name": "List (paginated)",
+      "method": "GET",
+      "url": "{{ base_url }}/media",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",   "value": "1",     "disabled": false },
+        { "name": "limit",  "value": "20",    "disabled": false },
+        { "name": "search", "value": "фото",  "disabled": true }
+      ]
+    },
+    {
+      "_id": "req_media_upload",
+      "_type": "request",
+      "parentId": "fld_media",
+      "name": "Upload (webp, max 200KB × 10)",
+      "method": "POST",
+      "url": "{{ base_url }}/media",
+      "headers": [],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "files",
+            "value": "",
+            "type": "file",
+            "disabled": false,
+            "description": "До 10 .webp файлов, макс 200 КБ каждый"
+          },
+          {
+            "name": "alt[]",
+            "value": "Описание первого изображения",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "name": "alt[]",
+            "value": "Описание второго изображения",
+            "type": "text",
+            "disabled": true
+          }
+        ]
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_media_delete",
+      "_type": "request",
+      "parentId": "fld_media",
+      "name": "Delete",
+      "method": "DELETE",
+      "url": "{{ base_url }}/media/1",
+      "headers": [],
+      "body": {},
+      "parameters": []
+    }
+  ]
+}

@@ -83,7 +83,7 @@ export abstract class BaseCrudController<
       findOptions.where = filters as FindOptionsWhere<Entity>;
     }
 
-    return this.service.paginate(findOptions, { page, limit });
+    return this.service.paginate(findOptions, { page: +page, limit: +limit });
   }
 
   @Patch(':id')

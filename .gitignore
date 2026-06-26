@@ -46,6 +46,14 @@ lerna-debug.log*
 .temp
 .tmp
 
+# large archives
+*.tar
+*.tar.gz
+*.zip
+
+# uploaded files
+/uploads
+
 # Runtime data
 pids
 *.pid

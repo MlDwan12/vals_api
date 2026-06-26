@@ -3,9 +3,10 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
+  Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -20,6 +21,8 @@ import {
 import { ArticleMainInfoDto } from './dto/article-main-info.dto';
 import { ArticleSearchReindexService } from './article-search-reindex.service';
 import { ReindexResult } from '../search/interfaces/reindex-result.interface';
+import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
 @Controller('articles')
 export class ArticlesController extends BaseCrudController<
@@ -43,21 +46,20 @@ export class ArticlesController extends BaseCrudController<
 
   @Get('all/main-info')
   @ApiOperation({ summary: 'Получить список статей с основной информацией' })
-  @ApiOkResponse({
-    description: 'Список статей',
-    type: ArticleMainInfoDto,
-    isArray: true,
-  })
-  async getMainServiceInfoList(): Promise<ArticleMainInfoDto[]> {
-    return await this.service.findListArticleMainInfo();
+  @ApiOkResponse({ description: 'Список статей с пагинацией' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getMainServiceInfoList(
+    @Query() query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<ArticleMainInfoDto>> {
+    return this.service.findListArticleMainInfo(query);
   }
 
   @Get('info/:slug')
-  @ApiOperation({ summary: 'Получить элемент по ID' })
-  @ApiOkResponse({ description: 'Элемент найден' })
-  @ApiNotFoundResponse({ description: 'Элемент не найден' })
+  @ApiOperation({ summary: 'Получить опубликованную статью по slug (сайт)' })
+  @ApiOkResponse({ description: 'Статья найдена' })
+  @ApiNotFoundResponse({ description: 'Статья не найдена или не опубликована' })
   async getArticleInfo(@Param('slug') slug: string) {
-    return await this.service.findBySlugOrFail(slug);
+    return await this.service.findPublishedBySlugOrFail(slug);
   }
 
   @Post('reindex')

@@ -10,6 +10,7 @@ import {
   MaxLength,
   Min,
   ArrayMinSize,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateCaseDto {
@@ -69,4 +70,18 @@ export class CreateCaseDto {
   @IsString()
   @MaxLength(255)
   keywords?: string;
+
+  @ApiPropertyOptional({
+    example: '2026-07-01T00:00:00.000Z',
+    description: 'Дата публикации. null — черновик, будущая — запланированная, прошедшая — опубликованная',
+  })
+  @IsOptional()
+  @IsDateString()
+  datePublished?: string | null;
+
+  @ApiPropertyOptional({ example: 0, description: 'Приоритет (чем выше — тем выше в списке)' })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  priority?: number;
 }

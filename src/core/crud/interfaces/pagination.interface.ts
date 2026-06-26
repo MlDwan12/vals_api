@@ -9,3 +9,11 @@ export interface PaginationResult<T> {
   page: number;
   limit: number;
 }
+
+export interface AdminPaginatedResponse<T> {
+  items: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}

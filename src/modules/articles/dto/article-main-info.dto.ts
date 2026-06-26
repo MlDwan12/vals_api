@@ -13,6 +13,12 @@ export class ArticleMainInfoDto {
   @ApiProperty({ nullable: true })
   description!: string | null;
 
+  @ApiProperty({ nullable: true })
+  datePublished!: Date | null;
+
+  @ApiProperty()
+  priority!: number;
+
   @ApiProperty()
   createdAt!: Date;
 
