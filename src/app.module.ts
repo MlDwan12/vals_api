@@ -30,6 +30,7 @@ import { MediaModule } from './modules/media/media.module';
 import { ClientModule } from './modules/client/client.module';
 import securityConfig from './config/security.config';
 import { SearchModule } from './modules/search/search.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -85,7 +86,7 @@ import { SearchModule } from './modules/search/search.module';
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads', // URL-префикс
-      exclude: ['/docs*'], // чтобы не было конфликтов
+      exclude: ['/docs/(.*)'],
       serveStaticOptions: {
         fallthrough: false, // fail-fast если файл не найден
         maxAge: '7d', // кеширование для статики
@@ -109,6 +110,7 @@ import { SearchModule } from './modules/search/search.module';
     MediaModule,
     ClientModule,
     SearchModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [],

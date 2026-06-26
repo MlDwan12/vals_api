@@ -14,10 +14,12 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
 import { MediaService } from './media.service';
 import { GetMediaDto } from './dto/get-media.dto';
 import { UploadMediaDto } from './dto/upload-media.dto';
 
+@ApiTags('media')
 @Controller('media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
@@ -29,6 +31,25 @@ export class MediaController {
   }
 
   @Post()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+          description: 'WEBP файлы (макс. 10 шт., до 200 КБ каждый)',
+        },
+        alt: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Alt-тексты для каждого файла (по порядку)',
+        },
+      },
+      required: ['files'],
+    },
+  })
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       limits: {
