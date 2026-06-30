@@ -21,7 +21,9 @@ async function bootstrap() {
   app.useLogger(logger);
 
   // Базовая безопасность и перфоманс
-  app.use(helmet()); // Helmet (можно заменить на наш HelmetGuard, если хочешь тонкую настройку CSP)
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow images from /uploads to be loaded cross-origin
+  }));
   app.use(cookieParser());
   app.use(compression());
 

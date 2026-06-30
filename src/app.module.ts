@@ -88,8 +88,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
       serveRoot: '/uploads', // URL-префикс
       exclude: ['/docs/(.*)'],
       serveStaticOptions: {
-        fallthrough: false, // fail-fast если файл не найден
-        maxAge: '7d', // кеширование для статики
+        fallthrough: true,
+        maxAge: '7d',
         immutable: true,
       },
     }),
