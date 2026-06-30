@@ -4,10 +4,11 @@ export interface PaginationOptions {
 }
 
 export interface PaginationResult<T> {
-  data: T[];
+  items: T[];
   total: number;
   page: number;
   limit: number;
+  totalPages: number;
 }
 
 export interface AdminPaginatedResponse<T> {

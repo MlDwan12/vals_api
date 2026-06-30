@@ -37,7 +37,7 @@ export class ClientContactService {
       where.type = query.type;
     }
 
-    const [data, total] = await this.contactRepository.findAndCount({
+    const [items, total] = await this.contactRepository.findAndCount({
       where,
       order: { createdAt: 'DESC' },
       skip: (query.page - 1) * query.limit,
@@ -45,10 +45,11 @@ export class ClientContactService {
     });
 
     return {
-      data,
+      items,
       total,
       page: query.page,
       limit: query.limit,
+      totalPages: Math.ceil(total / query.limit),
     };
   }
 

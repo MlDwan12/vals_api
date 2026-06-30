@@ -48,13 +48,14 @@ export class ClientLeadAdminService {
       take: query.limit,
     };
 
-    const [data, total] = await this.leadRepository.findAndCount(options);
+    const [items, total] = await this.leadRepository.findAndCount(options);
 
     return {
-      data,
+      items,
       total,
       page: query.page,
       limit: query.limit,
+      totalPages: Math.ceil(total / query.limit),
     };
   }
 
