@@ -86,7 +86,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads', // URL-префикс
-      exclude: ['/docs/(.*)'],
+      exclude: ['/docs/*splat'],
       serveStaticOptions: {
         fallthrough: true,
         maxAge: '7d',

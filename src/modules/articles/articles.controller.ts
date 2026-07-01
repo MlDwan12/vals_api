@@ -54,6 +54,16 @@ export class ArticlesController extends BaseCrudController<
     return this.service.findListArticleMainInfo(query);
   }
 
+  @Get('published/main-info')
+  @ApiOperation({ summary: 'Получить список опубликованных статей с пагинацией (сайт)' })
+  @ApiOkResponse({ description: 'Список опубликованных статей с пагинацией' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getPublishedMainInfoList(
+    @Query() query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<ArticleMainInfoDto>> {
+    return this.service.findListPublishedArticleMainInfo(query);
+  }
+
   @Get('info/:slug')
   @ApiOperation({ summary: 'Получить опубликованную статью по slug (сайт)' })
   @ApiOkResponse({ description: 'Статья найдена' })

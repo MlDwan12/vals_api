@@ -70,6 +70,13 @@ export class ArticlesService extends BaseCrudService<
     return this.repository.findMainInfoList(query);
   }
 
+  /** Публичный эндпоинт сайта — только опубликованные (datePublished <= now) */
+  async findListPublishedArticleMainInfo(
+    query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<ArticleMainInfoDto>> {
+    return this.repository.findPublishedMainInfoList(query);
+  }
+
   async findBySlugOrFail(slug: string): Promise<Article> {
     const article = await this.repository.findBySlug(slug);
 

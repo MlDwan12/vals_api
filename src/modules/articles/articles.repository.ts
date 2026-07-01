@@ -55,6 +55,37 @@ export class ArticleRepository extends BaseCrudRepository<Article> {
     };
   }
 
+  /** Публичный эндпоинт сайта — только опубликованные (datePublished <= now) */
+  async findPublishedMainInfoList(
+    query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<ArticleMainInfoDto>> {
+    const { page, limit, search, sortBy } = query;
+    const sort = sortBy ? sortMap[sortBy] : sortMap[SortByDate.CREATED_DESC];
+
+    const qb = this.repository
+      .createQueryBuilder('article')
+      .select([...ARTICLE_MAIN_FIELDS])
+      .where('article.datePublished IS NOT NULL')
+      .andWhere('article.datePublished <= :now', { now: new Date() })
+      .orderBy(sort.column, sort.direction)
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    if (search) {
+      qb.andWhere('article.title ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      items: items as ArticleMainInfoDto[],
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
   async findBySlug(slug: string): Promise<Article | null> {
     return this.repository.findOne({ where: { slug } });
   }
