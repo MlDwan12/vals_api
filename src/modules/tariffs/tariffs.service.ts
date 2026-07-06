@@ -138,7 +138,7 @@ export class TariffsService extends BaseCrudService<
     });
 
     if (!tariff) {
-      throw new NotFoundException(`Tariff with ID ${id} not found`);
+      throw new NotFoundException(`Тариф с ID ${id} не найден`);
     }
 
     const { serviceId, periodsIds, ...rest } = dto;
@@ -156,7 +156,7 @@ export class TariffsService extends BaseCrudService<
       const currentBasePrice = tariff.basePrice;
 
       if (currentBasePrice === undefined || currentBasePrice === null) {
-        throw new NotFoundException('Base price is missing for tariff');
+        throw new NotFoundException('Базовая цена тарифа не указана');
       }
 
       let actualPeriodIds: number[];

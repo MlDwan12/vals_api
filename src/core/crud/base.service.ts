@@ -10,7 +10,7 @@ import { PinoLogger } from 'nestjs-pino';
 
 export class EntityNotFoundError extends Error {
   constructor(entity: string, id: any) {
-    super(`${entity} with id ${id} not found`);
+    super(`${entity} с id ${id} не найден`);
   }
 }
 
@@ -31,7 +31,7 @@ export abstract class BaseCrudService<
     const entity = await this.repository.findById(id);
     if (!entity) {
       throw new NotFoundException(
-        `${this.getEntityName()} with ID ${id} not found`,
+        `${this.getEntityName()} с ID ${id} не найден`,
       );
     }
     return entity;
@@ -40,7 +40,7 @@ export abstract class BaseCrudService<
   async findOneOrFail(options: FindOneOptions<Entity>): Promise<Entity> {
     const entity = await this.repository.findOne(options);
     if (!entity) {
-      throw new NotFoundException(`${this.getEntityName()} not found`);
+      throw new NotFoundException(`${this.getEntityName()} не найден`);
     }
     return entity;
   }
@@ -69,7 +69,7 @@ export abstract class BaseCrudService<
     );
     if (!updated) {
       throw new NotFoundException(
-        `${this.getEntityName()} with ID ${id} not found`,
+        `${this.getEntityName()} с ID ${id} не найден`,
       );
     }
     return updated;
@@ -79,7 +79,7 @@ export abstract class BaseCrudService<
     const deleted = await this.repository.delete(id);
     if (!deleted) {
       throw new NotFoundException(
-        `${this.getEntityName()} with ID ${id} not found`,
+        `${this.getEntityName()} с ID ${id} не найден`,
       );
     }
   }

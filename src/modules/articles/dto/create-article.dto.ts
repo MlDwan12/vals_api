@@ -9,6 +9,7 @@ import {
   IsInt,
   Min,
 } from 'class-validator';
+import { MaxKeywords } from 'src/common/validators/max-keywords.validator';
 
 export class CreateArticleDto {
   @ApiProperty({
@@ -82,17 +83,24 @@ export class CreateArticleDto {
   })
   @IsString()
   @IsOptional()
+  @MaxKeywords(5, {
+    message: 'Можно указать не более 5 ключевых фраз',
+  })
   keywords?: string;
 
   @ApiPropertyOptional({
     example: '2026-07-01T00:00:00.000Z',
-    description: 'Дата публикации. null — черновик, будущая дата — запланированная, прошедшая — опубликованная',
+    description:
+      'Дата публикации. null — черновик, будущая дата — запланированная, прошедшая — опубликованная',
   })
   @IsOptional()
   @IsDateString()
   datePublished?: string | null;
 
-  @ApiPropertyOptional({ example: 0, description: 'Приоритет (чем выше — тем выше в списке)' })
+  @ApiPropertyOptional({
+    example: 0,
+    description: 'Приоритет (чем выше — тем выше в списке)',
+  })
   @IsOptional()
   @IsInt()
   @Min(0)

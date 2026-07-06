@@ -37,14 +37,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     if (!refreshToken) {
       this.logger.warn('No refresh token in cookies');
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Не авторизован');
     }
     try {
       const refreshGuard = new (AuthGuard('jwt-refresh'))();
       const refreshValid = await refreshGuard.canActivate(context);
 
       if (!refreshValid) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('Не авторизован');
       }
 
       const user = request.user;
@@ -69,7 +69,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     } catch (error) {
       this.logger.error('Refresh token validation failed', error?.stack);
 
-      throw new UnauthorizedException('Refresh token invalid');
+      throw new UnauthorizedException('Токен обновления недействителен');
     }
   }
 }

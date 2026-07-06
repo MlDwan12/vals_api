@@ -6,7 +6,6 @@ import { Logger } from 'nestjs-pino';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
-import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { GlobalValidationPipe } from './common/security/validation/validation.pipe';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
@@ -43,9 +42,6 @@ async function bootstrap() {
 
   // УДАЛИЛ встроенный ValidationPipe — оставляем только наш крутой
   app.useGlobalPipes(new GlobalValidationPipe());
-
-  // Глобальный фильтр исключений
-  app.useGlobalFilters(new AllExceptionsFilter()); // передай logger, если хочешь логировать
 
   // 1. Создаём OpenAPI-документ (как раньше)
 

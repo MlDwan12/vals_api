@@ -18,7 +18,7 @@ export class ClientContactService {
     });
 
     if (!contact) {
-      throw new NotFoundException(`ClientContact with ID ${id} not found`);
+      throw new NotFoundException(`Контакт клиента с ID ${id} не найден`);
     }
 
     return contact;

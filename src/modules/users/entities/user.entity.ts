@@ -17,7 +17,7 @@ export class User {
   @Column({
     type: 'varchar',
     length: 32,
-    default: UserRole.USER,
+    default: UserRole.CONTENT_MANAGER,
   })
   role: UserRole;
 }

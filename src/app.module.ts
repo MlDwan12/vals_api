@@ -31,6 +31,7 @@ import { ClientModule } from './modules/client/client.module';
 import securityConfig from './config/security.config';
 import { SearchModule } from './modules/search/search.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -111,6 +112,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     ClientModule,
     SearchModule,
     DashboardModule,
+    AuditModule,
   ],
   controllers: [],
   providers: [],

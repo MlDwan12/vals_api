@@ -42,7 +42,7 @@ export class ImageLibService extends BaseCrudService<
     files: Express.Multer.File[],
   ): Promise<ImageLib[]> {
     if (!files || files.length === 0) {
-      throw new BadRequestException('No files uploaded');
+      throw new BadRequestException('Файлы не загружены');
     }
 
     const rows: Array<Partial<ImageLib>> = files.map((file, index) =>
@@ -65,7 +65,7 @@ export class ImageLibService extends BaseCrudService<
       }
 
       this.logger.error({ err }, 'ImageLib upload: db save failed');
-      throw new InternalServerErrorException('Failed to save uploaded images');
+      throw new InternalServerErrorException('Не удалось сохранить загруженные изображения');
     }
   }
 
@@ -148,7 +148,7 @@ export class ImageLibService extends BaseCrudService<
         'Unsafe file link detected',
       );
 
-      throw new InternalServerErrorException('Unsafe file path');
+      throw new InternalServerErrorException('Небезопасный путь к файлу');
     }
 
     return absPath;

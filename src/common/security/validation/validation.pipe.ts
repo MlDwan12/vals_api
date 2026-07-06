@@ -23,7 +23,7 @@ export class GlobalValidationPipe implements PipeTransform<any> {
 
     if (errors.length > 0) {
       throw new BadRequestException({
-        message: 'Validation failed',
+        message: 'Ошибка валидации',
         errors: this.formatErrors(errors),
         text: this.formatErrorsAsText(errors), // ← добавляем человекочитаемый текст
       });

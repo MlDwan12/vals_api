@@ -154,7 +154,7 @@ export class ServicesService extends BaseCrudService<
       .getOne();
 
     if (!service) {
-      throw new NotFoundException(`Service with slug ${slug} not found`);
+      throw new NotFoundException(`Услуга со slug "${slug}" не найдена`);
     }
 
     return service;
@@ -162,7 +162,7 @@ export class ServicesService extends BaseCrudService<
 
   async findBySlug(slug: string): Promise<Service> {
     const service = await this.repository.findOne({ where: { slug } });
-    if (!service) throw new NotFoundException();
+    if (!service) throw new NotFoundException('Услуга не найдена');
     return service;
   }
 

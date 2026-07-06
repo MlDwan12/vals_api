@@ -15,6 +15,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { CLIENT_ROLES } from 'src/common/constants/roles.constant';
 import { ClientLeadAdminService } from '../services/client-lead-admin.service';
 import { ClientLeadEntity } from '../entities/client-lead.entity';
 import { ClientLeadQueryDto } from '../dto/client-lead-query.dto';
@@ -23,7 +26,8 @@ import { ClientLeadListItemDto } from '../dto/client-lead-list-item.dto';
 
 @ApiTags('client-leads')
 @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(...CLIENT_ROLES)
 @Controller('client-leads')
 export class ClientLeadAdminController {
   constructor(

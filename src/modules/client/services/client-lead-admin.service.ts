@@ -20,7 +20,7 @@ export class ClientLeadAdminService {
     });
 
     if (!lead) {
-      throw new NotFoundException(`ClientLead with ID ${id} not found`);
+      throw new NotFoundException(`Заявка клиента с ID ${id} не найдена`);
     }
 
     return lead;

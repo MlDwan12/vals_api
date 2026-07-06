@@ -28,6 +28,9 @@ import { BaseCrudService } from './base.service';
 import { FindManyOptions, FindOptionsWhere } from 'typeorm';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { DomainRestrictionGuard } from 'src/common/guards/domain-restriction.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { CONTENT_ROLES } from 'src/common/constants/roles.constant';
 
 @ApiTags('crud')
 export abstract class BaseCrudController<
@@ -44,11 +47,11 @@ export abstract class BaseCrudController<
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, DomainRestrictionGuard)
+  @Roles(...CONTENT_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Создать новый элемент' })
   @ApiCreatedResponse({ description: 'Элемент успешно создан' })
-  @ApiBearerAuth()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async create(@Body() dto: CreateDto): Promise<Entity> {
     return this.service.create(dto);
@@ -58,7 +61,6 @@ export abstract class BaseCrudController<
   @ApiOperation({ summary: 'Получить элемент по ID' })
   @ApiOkResponse({ description: 'Элемент найден' })
   @ApiNotFoundResponse({ description: 'Элемент не найден' })
-  @ApiBearerAuth()
   async findById(@Param('id', ParseIntPipe) id: number): Promise<Entity> {
     return this.service.findById(id);
   }
@@ -68,7 +70,6 @@ export abstract class BaseCrudController<
   @ApiOkResponse({ description: 'Пагинированный список' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
-  @ApiBearerAuth()
   async paginate(
     @Query('page') page = 1,
     @Query('limit') limit = 20,
@@ -87,12 +88,12 @@ export abstract class BaseCrudController<
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, DomainRestrictionGuard)
+  @Roles(...CONTENT_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Обновить элемент по ID' })
   @ApiOkResponse({ description: 'Элемент обновлён' })
   @ApiNotFoundResponse({ description: 'Элемент не найден' })
-  @ApiBearerAuth()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -102,13 +103,13 @@ export abstract class BaseCrudController<
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, DomainRestrictionGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, DomainRestrictionGuard)
+  @Roles(...CONTENT_ROLES)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить элемент по ID' })
   @ApiNoContentResponse({ description: 'Элемент удалён' })
   @ApiNotFoundResponse({ description: 'Элемент не найден' })
-  @ApiBearerAuth()
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.remove(id);
   }

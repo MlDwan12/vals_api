@@ -101,7 +101,7 @@ export class CasesService extends BaseCrudService<
       });
 
       if (!existing) {
-        throw new NotFoundException(`Case ${id} not found`);
+        throw new NotFoundException(`Кейс с ID ${id} не найден`);
       }
 
       // связи
@@ -156,7 +156,7 @@ export class CasesService extends BaseCrudService<
   private normalizeIds(ids: number[]): number[] {
     const uniq = Array.from(new Set(ids));
     if (uniq.length === 0) {
-      throw new BadRequestException('serviceIds must not be empty');
+      throw new BadRequestException('serviceIds не должен быть пустым');
     }
     return uniq;
   }
@@ -167,7 +167,7 @@ export class CasesService extends BaseCrudService<
     const foundSet = new Set(found);
     const missing = requested.filter((id) => !foundSet.has(id));
 
-    throw new BadRequestException(`Services not found: ${missing.join(', ')}`);
+    throw new BadRequestException(`Услуги не найдены: ${missing.join(', ')}`);
   }
 
   async findListCaseMainInfo(
@@ -257,7 +257,7 @@ export class CasesService extends BaseCrudService<
       .getRawOne();
 
     if (!row) {
-      throw new NotFoundException(`${this.getEntityName()} not found`);
+      throw new NotFoundException(`${this.getEntityName()} не найден`);
     }
     return row;
   }

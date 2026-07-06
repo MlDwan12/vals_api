@@ -37,10 +37,15 @@ export class Article {
   @Column({ type: 'text', nullable: true })
   metaDescription: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'text', nullable: true })
   keywords: string;
 
-  @Column({ type: 'timestamptz', nullable: true, name: 'date_published', default: null })
+  @Column({
+    type: 'timestamptz',
+    nullable: true,
+    name: 'date_published',
+    default: null,
+  })
   datePublished: Date | null;
 
   @Column({ type: 'int', default: 0 })
