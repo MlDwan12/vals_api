@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
   UploadedFiles,
@@ -27,9 +28,10 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CONTENT_ROLES } from 'src/common/constants/roles.constant';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import type { PaginationResult } from 'src/core/crud/interfaces/pagination.interface';
 
-@Controller('image-lib')
-export class ImageLibController extends BaseCrudController<
+@Controller('admin/image-lib')
+export class ImageLibAdminController extends BaseCrudController<
   ImageLib,
   CreateImageLibDto,
   UpdateImageLibDto
@@ -40,12 +42,31 @@ export class ImageLibController extends BaseCrudController<
     super(service);
   }
 
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...CONTENT_ROLES)
+  @ApiBearerAuth()
+  async paginate(
+    @Query('page') page = 1,
+    @Query('limit') limit = 20,
+  ): Promise<PaginationResult<ImageLib>> {
+    return this.service.paginate({}, { page: +page, limit: +limit });
+  }
+
   @Get('all')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...CONTENT_ROLES)
   @ApiBearerAuth()
   async getAll() {
     return this.service.findAll();
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...CONTENT_ROLES)
+  @ApiBearerAuth()
+  async findById(@Param('id', ParseIntPipe) id: number): Promise<ImageLib> {
+    return this.service.findById(id);
   }
 
   @Post('upload')

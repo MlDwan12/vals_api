@@ -4,13 +4,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CrudModule } from 'src/core/crud/crud.factory';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersController } from './users.controller';
+import { UsersAdminController } from './users-admin.controller';
 import { UsersService } from './users.service';
 import { UserRepository } from './user.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
-  controllers: [UsersController],
+  controllers: [UsersAdminController],
   providers: [UsersService, UserRepository],
   exports: [UsersService],
 })

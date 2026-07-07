@@ -28,7 +28,7 @@ import { ClientLeadListItemDto } from '../dto/client-lead-list-item.dto';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(...CLIENT_ROLES)
-@Controller('client-leads')
+@Controller('admin/client-leads')
 export class ClientLeadAdminController {
   constructor(
     private readonly clientLeadAdminService: ClientLeadAdminService,

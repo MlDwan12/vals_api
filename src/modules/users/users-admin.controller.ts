@@ -38,8 +38,8 @@ import type { PaginationResult } from 'src/core/crud/interfaces/pagination.inter
 @ApiTags('Пользователи')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('users')
-export class UsersController extends BaseCrudController<
+@Controller('admin/users')
+export class UsersAdminController extends BaseCrudController<
   User,
   CreateUserDto,
   UpdateUserDto
@@ -50,7 +50,7 @@ export class UsersController extends BaseCrudController<
     super(service);
   }
 
-  @Post()
+  @Post('content-managers')
   @UseGuards(JwtAuthGuard, RolesGuard, DomainRestrictionGuard)
   @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Создать контент-менеджера' })

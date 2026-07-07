@@ -27,7 +27,7 @@ import { ClientContactService } from '../services/client-contact.service';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(...CLIENT_ROLES)
-@Controller('client-contacts')
+@Controller('admin/client-contacts')
 export class ClientContactAdminController {
   constructor(private readonly clientContactService: ClientContactService) {}
 
