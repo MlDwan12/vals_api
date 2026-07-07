@@ -29,6 +29,16 @@ type CaseRow = {
   updatedAt: Date;
   serviceIds: number[];
 };
+
+const CASE_SORT_MAP: Record<SortByDate, { column: string; direction: 'ASC' | 'DESC' }> = {
+  [SortByDate.UPDATED_DESC]:   { column: 'cases.updatedAt',     direction: 'DESC' },
+  [SortByDate.UPDATED_ASC]:    { column: 'cases.updatedAt',     direction: 'ASC'  },
+  [SortByDate.CREATED_DESC]:   { column: 'cases.createdAt',     direction: 'DESC' },
+  [SortByDate.CREATED_ASC]:    { column: 'cases.createdAt',     direction: 'ASC'  },
+  [SortByDate.PUBLISHED_DESC]: { column: 'cases.datePublished', direction: 'DESC' },
+  [SortByDate.PUBLISHED_ASC]:  { column: 'cases.datePublished', direction: 'ASC'  },
+};
+
 @Injectable()
 export class CasesService extends BaseCrudService<
   Case,
@@ -174,17 +184,7 @@ export class CasesService extends BaseCrudService<
     query: AdminListQueryDto,
   ): Promise<AdminPaginatedResponse<Case>> {
     const { page, limit, search, sortBy } = query;
-
-    const sortMap: Record<SortByDate, { column: string; direction: 'ASC' | 'DESC' }> = {
-      [SortByDate.UPDATED_DESC]:   { column: 'cases.updatedAt',     direction: 'DESC' },
-      [SortByDate.UPDATED_ASC]:    { column: 'cases.updatedAt',     direction: 'ASC'  },
-      [SortByDate.CREATED_DESC]:   { column: 'cases.createdAt',     direction: 'DESC' },
-      [SortByDate.CREATED_ASC]:    { column: 'cases.createdAt',     direction: 'ASC'  },
-      [SortByDate.PUBLISHED_DESC]: { column: 'cases.datePublished', direction: 'DESC' },
-      [SortByDate.PUBLISHED_ASC]:  { column: 'cases.datePublished', direction: 'ASC'  },
-    };
-
-    const sort = sortBy ? sortMap[sortBy] : sortMap[SortByDate.UPDATED_DESC];
+    const sort = sortBy ? CASE_SORT_MAP[sortBy] : CASE_SORT_MAP[SortByDate.UPDATED_DESC];
 
     const qb = this.repository.repository
       .createQueryBuilder('cases')
@@ -195,6 +195,38 @@ export class CasesService extends BaseCrudService<
 
     if (search) {
       qb.where('cases.title ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      items,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  /** Публичный эндпоинт сайта — список опубликованных кейсов с пагинацией */
+  async findListPublishedCaseMainInfo(
+    query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<Case>> {
+    const { page, limit, search, sortBy } = query;
+    const sort = sortBy ? CASE_SORT_MAP[sortBy] : CASE_SORT_MAP[SortByDate.PUBLISHED_DESC];
+
+    const qb = this.repository.repository
+      .createQueryBuilder('cases')
+      .select([...CASES_MAIN_FIELDS])
+      .where('cases.datePublished IS NOT NULL')
+      .andWhere('cases.datePublished <= :now', { now: new Date() })
+      .orderBy('cases.priority', 'DESC')
+      .addOrderBy(sort.column, sort.direction)
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    if (search) {
+      qb.andWhere('cases.title ILIKE :search', { search: `%${search}%` });
     }
 
     const [items, total] = await qb.getManyAndCount();

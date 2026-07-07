@@ -226,6 +226,20 @@
       ]
     },
     {
+      "_id": "req_cases_published_main_info",
+      "_type": "request",
+      "parentId": "fld_cases",
+      "name": "List Published Main Info (сайт — только опубликованные)",
+      "method": "GET",
+      "url": "{{ base_url }}/cases/published/main-info",
+      "headers": [],
+      "body": {},
+      "parameters": [
+        { "name": "page",   "value": "1",  "disabled": false },
+        { "name": "limit",  "value": "20", "disabled": false }
+      ]
+    },
+    {
       "_id": "req_cases_by_service_slug",
       "_type": "request",
       "parentId": "fld_cases",

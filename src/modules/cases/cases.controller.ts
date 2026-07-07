@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CasesService } from './cases.service';
 import {
   ApiNotFoundResponse,
@@ -6,11 +6,24 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
+import { Case } from './entities/case.entity';
 
 @ApiTags('Кейсы')
 @Controller('cases')
 export class CasesController {
   constructor(private readonly service: CasesService) {}
+
+  @Get('published/main-info')
+  @ApiOperation({ summary: 'Получить список опубликованных кейсов с пагинацией (сайт)' })
+  @ApiOkResponse({ description: 'Список опубликованных кейсов с пагинацией' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getPublishedMainInfoList(
+    @Query() query: AdminListQueryDto,
+  ): Promise<AdminPaginatedResponse<Case>> {
+    return this.service.findListPublishedCaseMainInfo(query);
+  }
 
   @Get('service/:slug')
   async getCasesByServiceSlug(@Param('slug') slug: string) {
