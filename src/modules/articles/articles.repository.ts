@@ -60,14 +60,16 @@ export class ArticleRepository extends BaseCrudRepository<Article> {
     query: AdminListQueryDto,
   ): Promise<AdminPaginatedResponse<ArticleMainInfoDto>> {
     const { page, limit, search, sortBy } = query;
-    const sort = sortBy ? sortMap[sortBy] : sortMap[SortByDate.CREATED_DESC];
+    const sort = sortBy ? sortMap[sortBy] : sortMap[SortByDate.PUBLISHED_DESC];
 
     const qb = this.repository
       .createQueryBuilder('article')
       .select([...ARTICLE_MAIN_FIELDS])
       .where('article.datePublished IS NOT NULL')
       .andWhere('article.datePublished <= :now', { now: new Date() })
-      .orderBy(sort.column, sort.direction)
+      .orderBy('article.priority', 'DESC')
+      .addOrderBy(sort.column, sort.direction)
+      .addOrderBy('article.id', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 

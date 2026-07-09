@@ -222,6 +222,7 @@ export class CasesService extends BaseCrudService<
       .andWhere('cases.datePublished <= :now', { now: new Date() })
       .orderBy('cases.priority', 'DESC')
       .addOrderBy(sort.column, sort.direction)
+      .addOrderBy('cases.id', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
