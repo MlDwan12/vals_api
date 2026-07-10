@@ -1,5 +1,6 @@
 import { Industry } from '../../industry/entities/industry.entity';
 import { Service } from '../../services/entities/service.entity';
+import { Employee } from '../../employees/entities/employee.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
@@ -69,6 +70,17 @@ export class Case {
 
   @Column({ type: 'int', default: 0 })
   priority: number;
+
+  // Авторы (many-to-many, задел на соавторов — сейчас на практике один автор)
+  @ManyToMany(() => Employee, (employee) => employee.cases, {
+    onDelete: 'RESTRICT',
+  })
+  @JoinTable({
+    name: 'case_authors',
+    joinColumn: { name: 'case_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'employee_id', referencedColumnName: 'id' },
+  })
+  authors: Employee[];
 
   // ===== Даты =====
   @CreateDateColumn({ name: 'created_at' })

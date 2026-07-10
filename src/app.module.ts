@@ -32,6 +32,7 @@ import securityConfig from './config/security.config';
 import { SearchModule } from './modules/search/search.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { AuditModule } from './modules/audit/audit.module';
+import { EmployeesModule } from './modules/employees/employees.module';
 
 @Module({
   imports: [
@@ -113,6 +114,7 @@ import { AuditModule } from './modules/audit/audit.module';
     SearchModule,
     DashboardModule,
     AuditModule,
+    EmployeesModule,
   ],
   controllers: [],
   providers: [],

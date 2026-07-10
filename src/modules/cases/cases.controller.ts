@@ -6,7 +6,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
 import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 import { Case } from './entities/case.entity';
 
@@ -20,7 +20,7 @@ export class CasesController {
   @ApiOkResponse({ description: 'Список опубликованных кейсов с пагинацией' })
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async getPublishedMainInfoList(
-    @Query() query: AdminListQueryDto,
+    @Query() query: ContentListQueryDto,
   ): Promise<AdminPaginatedResponse<Case>> {
     return this.service.findListPublishedCaseMainInfo(query);
   }

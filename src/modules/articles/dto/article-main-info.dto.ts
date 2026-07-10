@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { EmployeeShortDto } from 'src/modules/employees/dto/employee-short.dto';
 
 export class ArticleMainInfoDto {
   @ApiProperty()
@@ -24,4 +25,7 @@ export class ArticleMainInfoDto {
 
   @ApiProperty()
   updatedAt!: Date;
+
+  @ApiProperty({ type: [EmployeeShortDto] })
+  authors!: EmployeeShortDto[];
 }

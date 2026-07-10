@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   Query,
@@ -26,7 +27,7 @@ import {
 import { ArticleMainInfoDto } from './dto/article-main-info.dto';
 import { ArticleSearchReindexService } from './article-search-reindex.service';
 import { ReindexResult } from '../search/interfaces/reindex-result.interface';
-import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
 import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -89,6 +90,21 @@ export class ArticlesAdminController extends BaseCrudController<
     return this.service.findById(id);
   }
 
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard, DomainRestrictionGuard)
+  @Roles(...CONTENT_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Обновить статью по ID' })
+  @ApiOkResponse({ description: 'Статья обновлена' })
+  @ApiNotFoundResponse({ description: 'Статья не найдена' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateArticleDto,
+  ): Promise<Article> {
+    return this.service.updateArticle(id, dto);
+  }
+
   @Get('all/main-info')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...CONTENT_ROLES)
@@ -97,7 +113,7 @@ export class ArticlesAdminController extends BaseCrudController<
   @ApiOkResponse({ description: 'Список статей с пагинацией' })
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async getMainServiceInfoList(
-    @Query() query: AdminListQueryDto,
+    @Query() query: ContentListQueryDto,
   ): Promise<AdminPaginatedResponse<ArticleMainInfoDto>> {
     return this.service.findListArticleMainInfo(query);
   }

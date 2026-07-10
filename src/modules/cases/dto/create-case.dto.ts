@@ -84,4 +84,16 @@ export class CreateCaseDto {
   @IsInt()
   @Min(0)
   priority?: number;
+
+  @ApiProperty({
+    example: [1],
+    description: 'ID авторов (сотрудников) кейса — минимум один',
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(5)
+  @Type(() => Number)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  authorIds: number[];
 }

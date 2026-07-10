@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -8,6 +9,9 @@ import {
   IsDateString,
   IsInt,
   Min,
+  IsArray,
+  ArrayMinSize,
+  ArrayMaxSize,
 } from 'class-validator';
 import { MaxKeywords } from 'src/common/validators/max-keywords.validator';
 
@@ -105,4 +109,16 @@ export class CreateArticleDto {
   @IsInt()
   @Min(0)
   priority?: number;
+
+  @ApiProperty({
+    example: [1],
+    description: 'ID авторов (сотрудников) статьи — минимум один',
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(5)
+  @Type(() => Number)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  authorIds: number[];
 }

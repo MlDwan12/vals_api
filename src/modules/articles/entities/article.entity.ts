@@ -5,7 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Entity,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
+import { Employee } from '../../employees/entities/employee.entity';
 
 @Entity('articles')
 export class Article {
@@ -50,6 +53,17 @@ export class Article {
 
   @Column({ type: 'int', default: 0 })
   priority: number;
+
+  // Авторы (many-to-many, задел на соавторов — сейчас на практике один автор)
+  @ManyToMany(() => Employee, (employee) => employee.articles, {
+    onDelete: 'RESTRICT',
+  })
+  @JoinTable({
+    name: 'article_authors',
+    joinColumn: { name: 'article_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'employee_id', referencedColumnName: 'id' },
+  })
+  authors: Employee[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

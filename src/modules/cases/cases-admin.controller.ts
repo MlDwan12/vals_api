@@ -25,7 +25,7 @@ import {
 import { BaseCrudController } from 'src/core/crud/base.controller';
 import { ReindexResult } from '../search/interfaces/reindex-result.interface';
 import { CaseSearchReindexService } from './case-search-reindex.service';
-import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
+import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
 import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -82,7 +82,7 @@ export class CasesAdminController extends BaseCrudController<
   @ApiBearerAuth()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async getMainCaseInfoList(
-    @Query() query: AdminListQueryDto,
+    @Query() query: ContentListQueryDto,
   ): Promise<AdminPaginatedResponse<Case>> {
     return this.service.findListCaseMainInfo(query);
   }
