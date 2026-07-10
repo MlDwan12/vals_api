@@ -21,10 +21,10 @@ async function bootstrap() {
   app.useLogger(logger);
 
   // Базовая безопасность и перфоманс
-  app.use(helmet()); // для прода
-  // app.use(helmet({
-  //   crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow images from /uploads to be loaded cross-origin
-  // }));
+  // app.use(helmet()); // для прода
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow images from /uploads to be loaded cross-origin
+  }));
   app.use(cookieParser());
   app.use(compression());
 

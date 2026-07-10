@@ -80,7 +80,7 @@ import { AuditModule } from './modules/audit/audit.module';
           password: db.password,
           database: db.database,
           autoLoadEntities: true,
-          synchronize: true,
+          synchronize: false,
         };
       },
     }),

@@ -91,6 +91,8 @@ export class ArticlesService extends BaseCrudService<
   async findPublishedBySlugOrFail(slug: string): Promise<Article> {
     const article = await this.repository.findBySlugPublished(slug);
 
+    console.log('================> ', article);
+
     if (!article) {
       throw new NotFoundException(`Статья со slug "${slug}" не найдена`);
     }
