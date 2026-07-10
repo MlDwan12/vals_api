@@ -87,6 +87,17 @@ export class CasesAdminController extends BaseCrudController<
     return this.service.findListCaseMainInfo(query);
   }
 
+  @Get('slug/:slug')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...CONTENT_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Получить кейс по slug независимо от статуса публикации (для редактирования)' })
+  @ApiOkResponse({ description: 'Кейс найден' })
+  @ApiNotFoundResponse({ description: 'Кейс не найден' })
+  async findBySlug(@Param('slug') slug: string) {
+    return this.service.getCaseBySlugAdmin(slug);
+  }
+
   @Post('reindex')
   @UseGuards(JwtAuthGuard, RolesGuard, DomainRestrictionGuard)
   @Roles(...ADMIN_ROLES)

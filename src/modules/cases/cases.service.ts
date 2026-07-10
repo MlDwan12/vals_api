@@ -295,6 +295,42 @@ export class CasesService extends BaseCrudService<
     return row;
   }
 
+  /** Админ-эндпоинт — кейс по slug независимо от статуса публикации (черновики/отложенные) */
+  async getCaseBySlugAdmin(slug: string): Promise<CaseRow> {
+    const row = await this.repository.repository
+      .createQueryBuilder('cases')
+      .leftJoin('service_to_case', 'stc', 'stc.case_id = cases.id')
+      .select([
+        'cases.id AS id',
+        'cases.slug AS slug',
+        'cases.title AS title',
+        'cases.industry AS industry',
+        'cases.description AS description',
+        'cases.problem AS problem',
+        'cases.result AS result',
+        'cases.content AS content',
+        'cases.contentHtml AS "contentHtml"',
+        'cases.metaTitle AS "metaTitle"',
+        'cases.metaDescription AS "metaDescription"',
+        'cases.keywords AS "keywords"',
+        'cases.date_published AS "datePublished"',
+        'cases.created_at AS "createdAt"',
+        'cases.updated_at AS "updatedAt"',
+      ])
+      .addSelect(
+        `COALESCE(array_agg(stc.service_id) FILTER (WHERE stc.service_id IS NOT NULL), '{}')`,
+        'serviceIds',
+      )
+      .where('cases.slug = :slug', { slug })
+      .groupBy('cases.id')
+      .getRawOne();
+
+    if (!row) {
+      throw new NotFoundException(`${this.getEntityName()} не найден`);
+    }
+    return row;
+  }
+
   async remove(id: number): Promise<void> {
     const caseEntity = await this.findOneOrFail({ where: { id } });
 
