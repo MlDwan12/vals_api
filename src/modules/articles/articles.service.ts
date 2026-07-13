@@ -4,6 +4,7 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { Article } from './entities/article.entity';
 import { Employee } from '../employees/entities/employee.entity';
+import { Tag } from '../tags/entities/tag.entity';
 import { BaseCrudService } from 'src/core/crud/base.service';
 import { ArticleRepository } from './articles.repository';
 import { PinoLogger } from 'nestjs-pino';
@@ -38,6 +39,12 @@ export class ArticlesService extends BaseCrudService<
       });
       this.assertAllAuthorsFound(authorIds, authors.map((a) => a.id));
 
+      const tagIds = this.dedupeTagIds(dto.tagIds);
+      const tags = tagIds.length
+        ? await em.getRepository(Tag).find({ where: { id: In(tagIds) }, select: ['id'] })
+        : [];
+      if (tagIds.length) this.assertAllTagsFound(tagIds, tags.map((t) => t.id));
+
       const entity = em.getRepository(Article).create({
         slug: dto.slug,
         title: dto.title,
@@ -50,6 +57,7 @@ export class ArticlesService extends BaseCrudService<
         datePublished: dto.datePublished ? new Date(dto.datePublished) : null,
         priority: dto.priority ?? 0,
         authors,
+        tags,
       });
 
       const saved = await em.getRepository(Article).save(entity);
@@ -67,7 +75,7 @@ export class ArticlesService extends BaseCrudService<
       const articleRepo = em.getRepository(Article);
       const existing = await articleRepo.findOne({
         where: { id },
-        relations: { authors: true },
+        relations: { authors: true, tags: true },
       });
 
       if (!existing) {
@@ -83,6 +91,16 @@ export class ArticlesService extends BaseCrudService<
         });
         this.assertAllAuthorsFound(authorIds, authors.map((a) => a.id));
         existing.authors = authors;
+      }
+
+      if (dto.tagIds !== undefined) {
+        const tagIds = this.dedupeTagIds(dto.tagIds);
+
+        const tags = tagIds.length
+          ? await em.getRepository(Tag).find({ where: { id: In(tagIds) }, select: ['id'] })
+          : [];
+        if (tagIds.length) this.assertAllTagsFound(tagIds, tags.map((t) => t.id));
+        existing.tags = tags;
       }
 
       if (dto.slug !== undefined) existing.slug = dto.slug;
@@ -125,12 +143,39 @@ export class ArticlesService extends BaseCrudService<
     throw new BadRequestException(`Сотрудники не найдены: ${missing.join(', ')}`);
   }
 
+  /** Теги необязательны — в отличие от normalizeAuthorIds, не кидает на пустом/undefined массиве. */
+  private dedupeTagIds(ids?: number[]): number[] {
+    return Array.from(new Set(ids ?? []));
+  }
+
+  private assertAllTagsFound(requested: number[], found: number[]): void {
+    if (found.length === requested.length) return;
+
+    const foundSet = new Set(found);
+    const missing = requested.filter((id) => !foundSet.has(id));
+
+    throw new BadRequestException(`Теги не найдены: ${missing.join(', ')}`);
+  }
+
   async deleteArticle(id: number): Promise<void> {
     const article = await this.findOneOrFail({ where: { id } });
 
     await this.repository.delete(id);
 
     await this.searchIndexService.deleteDocument(`article_${article.id}`);
+  }
+
+  /** Переопределяет generic findById — форме редактирования в админке нужны текущие авторы и теги. */
+  async findById(id: number): Promise<Article> {
+    const article = await this.repository.findById(id, {
+      relations: { authors: true, tags: true },
+    });
+
+    if (!article) {
+      throw new NotFoundException(`Статья с ID ${id} не найдена`);
+    }
+
+    return article;
   }
 
   async findListArticleMainInfo(
@@ -165,5 +210,17 @@ export class ArticlesService extends BaseCrudService<
     }
 
     return article;
+  }
+
+  /** Похожие статьи по совпадению тегов — блок «Похожие статьи» на странице статьи/кейса. */
+  async findSimilarPublished(
+    tagIds: number[],
+    excludeId: number | undefined,
+    limit = 6,
+  ): Promise<ArticleMainInfoDto[]> {
+    if (!tagIds.length) return [];
+
+    const ids = await this.repository.findSimilarRankedIds(tagIds, excludeId, limit);
+    return this.repository.findMainInfoByIds(ids);
   }
 }

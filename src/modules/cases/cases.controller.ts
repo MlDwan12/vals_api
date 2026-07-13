@@ -7,6 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
+import { SimilarContentQueryDto } from 'src/shared/dto/similar-content-query.dto';
 import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 import { Case } from './entities/case.entity';
 
@@ -14,6 +15,13 @@ import { Case } from './entities/case.entity';
 @Controller('cases')
 export class CasesController {
   constructor(private readonly service: CasesService) {}
+
+  @Get('similar')
+  @ApiOperation({ summary: 'Похожие кейсы по совпадению тегов (сайт)' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getSimilarCases(@Query() query: SimilarContentQueryDto): Promise<Case[]> {
+    return this.service.findSimilarPublished(query.tagIds, query.excludeId, query.limit);
+  }
 
   @Get('published/main-info')
   @ApiOperation({ summary: 'Получить список опубликованных кейсов с пагинацией (сайт)' })

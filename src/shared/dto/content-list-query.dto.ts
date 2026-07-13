@@ -8,4 +8,9 @@ export class ContentListQueryDto extends AdminListQueryDto {
   @IsOptional()
   @IsString()
   authorSlug?: string;
+
+  @ApiPropertyOptional({ description: 'Показать только материалы с этим тегом (slug тега)' })
+  @IsOptional()
+  @IsString()
+  tagSlug?: string;
 }

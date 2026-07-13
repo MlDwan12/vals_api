@@ -1,6 +1,7 @@
 import { Industry } from '../../industry/entities/industry.entity';
 import { Service } from '../../services/entities/service.entity';
 import { Employee } from '../../employees/entities/employee.entity';
+import { Tag } from '../../tags/entities/tag.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
@@ -81,6 +82,17 @@ export class Case {
     inverseJoinColumn: { name: 'employee_id', referencedColumnName: 'id' },
   })
   authors: Employee[];
+
+  // Теги — many-to-many, общий справочник со статьями и кейсами
+  @ManyToMany(() => Tag, (tag) => tag.cases, {
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'case_tags',
+    joinColumn: { name: 'case_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
+  })
+  tags: Tag[];
 
   // ===== Даты =====
   @CreateDateColumn({ name: 'created_at' })

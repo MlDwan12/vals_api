@@ -18,6 +18,9 @@ import { ServicesService } from '../services/services.service';
 import { Employee } from '../employees/entities/employee.entity';
 import { EmployeeShortDto } from '../employees/dto/employee-short.dto';
 import { EMPLOYEE_SHORT_FIELDS } from '../employees/queries/employee.selects';
+import { Tag } from '../tags/entities/tag.entity';
+import { TagShortDto } from '../tags/dto/tag-short.dto';
+import { TAG_SHORT_FIELDS } from '../tags/queries/tag.selects';
 import { CaseSearchDocumentBuilder } from '../search/builders/case-search-document.builder';
 import { SearchIndexService } from '../search/services/search-index.service';
 import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
@@ -33,6 +36,8 @@ type CaseRow = {
   serviceIds: number[];
   authorIds: number[];
   authors: EmployeeShortDto[];
+  tagIds: number[];
+  tags: TagShortDto[];
 };
 
 const CASE_SORT_MAP: Record<SortByDate, { column: string; direction: 'ASC' | 'DESC' }> = {
@@ -65,6 +70,7 @@ export class CasesService extends BaseCrudService<
   public async create(dto: CreateCaseDto): Promise<Case> {
     const serviceIds = this.normalizeIds(dto.serviceIds, 'serviceIds');
     const authorIds = this.normalizeIds(dto.authorIds, 'authorIds');
+    const tagIds = this.dedupeTagIds(dto.tagIds);
 
     return this.repository.transaction(async (em) => {
       const services = await em.getRepository(Service).find({
@@ -78,6 +84,11 @@ export class CasesService extends BaseCrudService<
         select: ['id'],
       });
       this.assertAllFound('Сотрудники', authorIds, authors.map((a) => a.id));
+
+      const tags = tagIds.length
+        ? await em.getRepository(Tag).find({ where: { id: In(tagIds) }, select: ['id'] })
+        : [];
+      if (tagIds.length) this.assertAllFound('Теги', tagIds, tags.map((t) => t.id));
 
       const entity = em.getRepository(Case).create({
         industry: dto.industry,
@@ -95,6 +106,7 @@ export class CasesService extends BaseCrudService<
         priority: dto.priority ?? 0,
         services,
         authors,
+        tags,
       });
 
       const saved = await em.getRepository(Case).save(entity);
@@ -104,7 +116,7 @@ export class CasesService extends BaseCrudService<
       );
       return em.getRepository(Case).findOneOrFail({
         where: { id: saved.id },
-        relations: { services: true, authors: true },
+        relations: { services: true, authors: true, tags: true },
       });
     });
   }
@@ -116,7 +128,7 @@ export class CasesService extends BaseCrudService<
 
       const existing = await caseRepo.findOne({
         where: { id },
-        relations: { services: true, authors: true },
+        relations: { services: true, authors: true, tags: true },
       });
 
       if (!existing) {
@@ -146,6 +158,16 @@ export class CasesService extends BaseCrudService<
         existing.authors = authors;
       }
 
+      if (dto.tagIds !== undefined) {
+        const tagIds = this.dedupeTagIds(dto.tagIds);
+
+        const tags = tagIds.length
+          ? await em.getRepository(Tag).find({ where: { id: In(tagIds) }, select: ['id'] })
+          : [];
+        if (tagIds.length) this.assertAllFound('Теги', tagIds, tags.map((t) => t.id));
+        existing.tags = tags;
+      }
+
       // поля
       if (dto.industry) existing.industry = dto.industry;
       if (dto.title) existing.title = dto.title;
@@ -168,14 +190,14 @@ export class CasesService extends BaseCrudService<
         this.caseSearchDocumentBuilder.build(
           await caseRepo.findOneOrFail({
             where: { id },
-            relations: { services: true, authors: true },
+            relations: { services: true, authors: true, tags: true },
           })!,
         ),
       );
 
       return caseRepo.findOneOrFail({
         where: { id },
-        relations: { services: true, authors: true },
+        relations: { services: true, authors: true, tags: true },
       });
     });
   }
@@ -186,6 +208,11 @@ export class CasesService extends BaseCrudService<
       throw new BadRequestException(`${fieldName} не должен быть пустым`);
     }
     return uniq;
+  }
+
+  /** Теги необязательны — в отличие от normalizeIds, не кидает на пустом/undefined массиве. */
+  private dedupeTagIds(ids?: number[]): number[] {
+    return Array.from(new Set(ids ?? []));
   }
 
   private assertAllFound(entityLabel: string, requested: number[], found: number[]): void {
@@ -200,14 +227,16 @@ export class CasesService extends BaseCrudService<
   async findListCaseMainInfo(
     query: ContentListQueryDto,
   ): Promise<AdminPaginatedResponse<Case>> {
-    const { page, limit, search, sortBy, authorSlug } = query;
+    const { page, limit, search, sortBy, authorSlug, tagSlug } = query;
     const sort = sortBy ? CASE_SORT_MAP[sortBy] : CASE_SORT_MAP[SortByDate.UPDATED_DESC];
 
     const qb = this.repository.repository
       .createQueryBuilder('cases')
       .leftJoin('cases.authors', 'author')
+      .leftJoin('cases.tags', 'tag')
       .select([...CASES_MAIN_FIELDS])
       .addSelect([...EMPLOYEE_SHORT_FIELDS])
+      .addSelect([...TAG_SHORT_FIELDS])
       .orderBy(sort.column, sort.direction)
       .skip((page - 1) * limit)
       .take(limit);
@@ -216,6 +245,7 @@ export class CasesService extends BaseCrudService<
       qb.andWhere('cases.title ILIKE :search', { search: `%${search}%` });
     }
     this.applyAuthorSlugFilter(qb, authorSlug);
+    this.applyTagSlugFilter(qb, tagSlug);
 
     const [items, total] = await qb.getManyAndCount();
 
@@ -232,14 +262,16 @@ export class CasesService extends BaseCrudService<
   async findListPublishedCaseMainInfo(
     query: ContentListQueryDto,
   ): Promise<AdminPaginatedResponse<Case>> {
-    const { page, limit, search, sortBy, authorSlug } = query;
+    const { page, limit, search, sortBy, authorSlug, tagSlug } = query;
     const sort = sortBy ? CASE_SORT_MAP[sortBy] : CASE_SORT_MAP[SortByDate.PUBLISHED_DESC];
 
     const qb = this.repository.repository
       .createQueryBuilder('cases')
       .leftJoin('cases.authors', 'author')
+      .leftJoin('cases.tags', 'tag')
       .select([...CASES_MAIN_FIELDS])
       .addSelect([...EMPLOYEE_SHORT_FIELDS])
+      .addSelect([...TAG_SHORT_FIELDS])
       .where('cases.datePublished IS NOT NULL')
       .andWhere('cases.datePublished <= :now', { now: new Date() })
       .orderBy('cases.priority', 'DESC')
@@ -252,6 +284,7 @@ export class CasesService extends BaseCrudService<
       qb.andWhere('cases.title ILIKE :search', { search: `%${search}%` });
     }
     this.applyAuthorSlugFilter(qb, authorSlug);
+    this.applyTagSlugFilter(qb, tagSlug);
 
     const [items, total] = await qb.getManyAndCount();
 
@@ -289,6 +322,25 @@ export class CasesService extends BaseCrudService<
     }).setParameter('authorSlug', authorSlug);
   }
 
+  /** Фильтр «только материалы с этим тегом» — тот же приём подзапроса, что и у авторов. */
+  private applyTagSlugFilter(
+    qb: SelectQueryBuilder<Case>,
+    tagSlug?: string,
+  ): void {
+    if (!tagSlug) return;
+
+    qb.andWhere((sub) => {
+      const subQuery = sub
+        .subQuery()
+        .select('ct.case_id')
+        .from('case_tags', 'ct')
+        .innerJoin('tags', 't', 't.id = ct.tag_id')
+        .where('t.slug = :tagSlug')
+        .getQuery();
+      return `cases.id IN ${subQuery}`;
+    }).setParameter('tagSlug', tagSlug);
+  }
+
   /** Публичный эндпоинт сайта — только опубликованные, приоритетная сортировка */
   async getCasesByServiceSlug(slug: string): Promise<Case[]> {
     const service = await this.servicesService.findBySlug(slug);
@@ -314,7 +366,7 @@ export class CasesService extends BaseCrudService<
     if (!row) {
       throw new NotFoundException(`${this.getEntityName()} не найден`);
     }
-    return this.attachAuthors(row);
+    return this.attachTags(await this.attachAuthors(row));
   }
 
   /** Админ-эндпоинт — кейс по slug независимо от статуса публикации (черновики/отложенные) */
@@ -324,7 +376,7 @@ export class CasesService extends BaseCrudService<
     if (!row) {
       throw new NotFoundException(`${this.getEntityName()} не найден`);
     }
-    return this.attachAuthors(row);
+    return this.attachTags(await this.attachAuthors(row));
   }
 
   private async fetchCaseRow(slug: string, publishedOnly: boolean): Promise<CaseRow | undefined> {
@@ -332,6 +384,7 @@ export class CasesService extends BaseCrudService<
       .createQueryBuilder('cases')
       .leftJoin('service_to_case', 'stc', 'stc.case_id = cases.id')
       .leftJoin('case_authors', 'ca', 'ca.case_id = cases.id')
+      .leftJoin('case_tags', 'ct', 'ct.case_id = cases.id')
       .select([
         'cases.id AS id',
         'cases.slug AS slug',
@@ -356,6 +409,10 @@ export class CasesService extends BaseCrudService<
       .addSelect(
         `COALESCE(array_agg(DISTINCT ca.employee_id) FILTER (WHERE ca.employee_id IS NOT NULL), '{}')`,
         'authorIds',
+      )
+      .addSelect(
+        `COALESCE(array_agg(DISTINCT ct.tag_id) FILTER (WHERE ct.tag_id IS NOT NULL), '{}')`,
+        'tagIds',
       )
       .where('cases.slug = :slug', { slug })
       .groupBy('cases.id');
@@ -382,6 +439,64 @@ export class CasesService extends BaseCrudService<
     });
 
     return { ...row, authors };
+  }
+
+  /** Лёгкая проекция тегов — отдельный запрос, тот же приём, что и attachAuthors. */
+  private async attachTags(row: CaseRow): Promise<CaseRow> {
+    if (!row.tagIds?.length) {
+      return { ...row, tags: [] };
+    }
+
+    const tags = await this.repo.manager.getRepository(Tag).find({
+      where: { id: In(row.tagIds) },
+      select: ['id', 'slug', 'name'],
+    });
+
+    return { ...row, tags };
+  }
+
+  /** Похожие кейсы по совпадению тегов — блок «Похожие кейсы» на странице статьи/кейса. */
+  async findSimilarPublished(
+    tagIds: number[],
+    excludeId: number | undefined,
+    limit = 6,
+  ): Promise<Case[]> {
+    if (!tagIds.length) return [];
+
+    const rankedQb = this.repository.repository
+      .createQueryBuilder('cases')
+      .innerJoin('case_tags', 'ct', 'ct.case_id = cases.id')
+      .select('cases.id', 'id')
+      .addSelect('COUNT(DISTINCT ct.tag_id)', 'matched')
+      .where('ct.tag_id IN (:...tagIds)', { tagIds })
+      .andWhere('cases.datePublished IS NOT NULL')
+      .andWhere('cases.datePublished <= :now', { now: new Date() })
+      .groupBy('cases.id')
+      .orderBy('matched', 'DESC')
+      .addOrderBy('cases.priority', 'DESC')
+      .addOrderBy('cases.datePublished', 'DESC')
+      .limit(limit);
+
+    if (excludeId) {
+      rankedQb.andWhere('cases.id != :excludeId', { excludeId });
+    }
+
+    const ranked = await rankedQb.getRawMany<{ id: number }>();
+    const ids = ranked.map((r) => r.id);
+    if (!ids.length) return [];
+
+    const items = await this.repository.repository
+      .createQueryBuilder('cases')
+      .leftJoin('cases.authors', 'author')
+      .leftJoin('cases.tags', 'tag')
+      .select([...CASES_MAIN_FIELDS])
+      .addSelect([...EMPLOYEE_SHORT_FIELDS])
+      .addSelect([...TAG_SHORT_FIELDS])
+      .where('cases.id IN (:...ids)', { ids })
+      .getMany();
+
+    const order = new Map(ids.map((id, idx) => [id, idx]));
+    return items.sort((a, b) => order.get(a.id)! - order.get(b.id)!);
   }
 
   async remove(id: number): Promise<void> {

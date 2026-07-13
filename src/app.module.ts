@@ -33,6 +33,7 @@ import { SearchModule } from './modules/search/search.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { EmployeesModule } from './modules/employees/employees.module';
+import { TagsModule } from './modules/tags/tags.module';
 
 @Module({
   imports: [
@@ -115,6 +116,7 @@ import { EmployeesModule } from './modules/employees/employees.module';
     DashboardModule,
     AuditModule,
     EmployeesModule,
+    TagsModule,
   ],
   controllers: [],
   providers: [],

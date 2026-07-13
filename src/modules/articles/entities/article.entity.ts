@@ -9,6 +9,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Employee } from '../../employees/entities/employee.entity';
+import { Tag } from '../../tags/entities/tag.entity';
 
 @Entity('articles')
 export class Article {
@@ -64,6 +65,17 @@ export class Article {
     inverseJoinColumn: { name: 'employee_id', referencedColumnName: 'id' },
   })
   authors: Employee[];
+
+  // Теги — many-to-many, общий справочник со статьями и кейсами
+  @ManyToMany(() => Tag, (tag) => tag.articles, {
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'article_tags',
+    joinColumn: { name: 'article_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
+  })
+  tags: Tag[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

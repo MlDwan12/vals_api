@@ -96,4 +96,16 @@ export class CreateCaseDto {
   @IsInt({ each: true })
   @Min(1, { each: true })
   authorIds: number[];
+
+  @ApiPropertyOptional({
+    example: [1, 2],
+    description: 'ID тегов кейса (необязательно)',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @Type(() => Number)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  tagIds?: number[];
 }

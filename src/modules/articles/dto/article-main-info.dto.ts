@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { EmployeeShortDto } from 'src/modules/employees/dto/employee-short.dto';
+import { TagShortDto } from 'src/modules/tags/dto/tag-short.dto';
 
 export class ArticleMainInfoDto {
   @ApiProperty()
@@ -28,4 +29,7 @@ export class ArticleMainInfoDto {
 
   @ApiProperty({ type: [EmployeeShortDto] })
   authors!: EmployeeShortDto[];
+
+  @ApiProperty({ type: [TagShortDto] })
+  tags!: TagShortDto[];
 }
