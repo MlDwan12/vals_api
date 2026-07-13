@@ -2,6 +2,7 @@ import { Industry } from '../../industry/entities/industry.entity';
 import { Service } from '../../services/entities/service.entity';
 import { Employee } from '../../employees/entities/employee.entity';
 import { Tag } from '../../tags/entities/tag.entity';
+import { CaseFaq } from './case-faq.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
@@ -12,6 +13,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('cases')
@@ -93,6 +95,10 @@ export class Case {
     inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
   })
   tags: Tag[];
+
+  // FAQ кейса — структурированные данные для FAQPage JSON-LD, порядок задаёт orderIndex
+  @OneToMany(() => CaseFaq, (faq) => faq.case)
+  faq: CaseFaq[];
 
   // ===== Даты =====
   @CreateDateColumn({ name: 'created_at' })

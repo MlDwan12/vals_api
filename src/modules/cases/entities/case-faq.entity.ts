@@ -1,0 +1,40 @@
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Entity,
+} from 'typeorm';
+import { Case } from './case.entity';
+
+@Entity('case_faq')
+export class CaseFaq {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ name: 'case_id' })
+  caseId: number;
+
+  @ManyToOne(() => Case, (caseEntity) => caseEntity.faq, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'case_id' })
+  case: Case;
+
+  @Column({ type: 'text' })
+  question: string;
+
+  @Column({ type: 'text' })
+  answer: string;
+
+  @Column({ name: 'order_index', type: 'int', default: 0 })
+  orderIndex: number;
+
+  @CreateDateColumn({ name: 'date_create' })
+  dateCreate: Date;
+
+  @UpdateDateColumn({ name: 'date_update' })
+  dateUpdate: Date;
+}

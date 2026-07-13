@@ -7,9 +7,11 @@ import {
   Entity,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
 import { Employee } from '../../employees/entities/employee.entity';
 import { Tag } from '../../tags/entities/tag.entity';
+import { ArticleFaq } from './article-faq.entity';
 
 @Entity('articles')
 export class Article {
@@ -76,6 +78,10 @@ export class Article {
     inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
   })
   tags: Tag[];
+
+  // FAQ статьи — структурированные данные для FAQPage JSON-LD, порядок задаёт orderIndex
+  @OneToMany(() => ArticleFaq, (faq) => faq.article)
+  faq: ArticleFaq[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

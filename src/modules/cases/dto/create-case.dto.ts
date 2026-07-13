@@ -11,7 +11,9 @@ import {
   Min,
   ArrayMinSize,
   IsDateString,
+  ValidateNested,
 } from 'class-validator';
+import { CaseFaqItemDto } from './case-faq-item.dto';
 
 export class CreateCaseDto {
   @ApiProperty({
@@ -108,4 +110,16 @@ export class CreateCaseDto {
   @IsInt({ each: true })
   @Min(1, { each: true })
   tagIds?: number[];
+
+  @ApiPropertyOptional({
+    type: [CaseFaqItemDto],
+    description:
+      'Список FAQ кейса (вопрос/ответ) — полностью заменяет текущий список при обновлении, порядок = порядок в массиве',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(15)
+  @ValidateNested({ each: true })
+  @Type(() => CaseFaqItemDto)
+  faq?: CaseFaqItemDto[];
 }

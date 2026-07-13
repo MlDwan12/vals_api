@@ -149,14 +149,16 @@ export class ArticleRepository extends BaseCrudRepository<Article> {
   async findBySlug(slug: string): Promise<Article | null> {
     return this.repository.findOne({
       where: { slug },
-      relations: { authors: true, tags: true },
+      relations: { authors: true, tags: true, faq: true },
+      order: { faq: { orderIndex: 'ASC' } },
     });
   }
 
   async findBySlugPublished(slug: string): Promise<Article | null> {
     return this.repository.findOne({
       where: { slug, datePublished: LessThanOrEqual(new Date()) },
-      relations: { authors: true, tags: true },
+      relations: { authors: true, tags: true, faq: true },
+      order: { faq: { orderIndex: 'ASC' } },
     });
   }
 

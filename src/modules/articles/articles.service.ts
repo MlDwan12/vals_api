@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { In } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { Article } from './entities/article.entity';
+import { ArticleFaq } from './entities/article-faq.entity';
 import { Employee } from '../employees/entities/employee.entity';
 import { Tag } from '../tags/entities/tag.entity';
 import { BaseCrudService } from 'src/core/crud/base.service';
@@ -62,12 +63,37 @@ export class ArticlesService extends BaseCrudService<
 
       const saved = await em.getRepository(Article).save(entity);
 
+      if (dto.faq?.length) {
+        await this.saveFaq(em, saved.id, dto.faq);
+      }
+
       await this.searchIndexService.upsertDocument(
         this.articleSearchDocumentBuilder.build(saved),
       );
 
       return saved;
     });
+  }
+
+  /** Полная замена FAQ статьи — форма админки всегда шлёт целиком актуальный список. */
+  private async saveFaq(
+    em: EntityManager,
+    articleId: number,
+    faq: { question: string; answer: string }[],
+  ): Promise<void> {
+    const faqRepo = em.getRepository(ArticleFaq);
+    await faqRepo.delete({ articleId });
+
+    if (!faq.length) return;
+
+    await faqRepo.insert(
+      faq.map((item, index) => ({
+        articleId,
+        question: item.question,
+        answer: item.answer,
+        orderIndex: index,
+      })),
+    );
   }
 
   async updateArticle(id: number, dto: UpdateArticleDto): Promise<Article> {
@@ -118,6 +144,10 @@ export class ArticlesService extends BaseCrudService<
 
       const saved = await articleRepo.save(existing);
 
+      if (dto.faq !== undefined) {
+        await this.saveFaq(em, saved.id, dto.faq);
+      }
+
       await this.searchIndexService.upsertDocument(
         this.articleSearchDocumentBuilder.build(saved),
       );
@@ -165,10 +195,11 @@ export class ArticlesService extends BaseCrudService<
     await this.searchIndexService.deleteDocument(`article_${article.id}`);
   }
 
-  /** Переопределяет generic findById — форме редактирования в админке нужны текущие авторы и теги. */
+  /** Переопределяет generic findById — форме редактирования в админке нужны текущие авторы, теги и FAQ. */
   async findById(id: number): Promise<Article> {
     const article = await this.repository.findById(id, {
-      relations: { authors: true, tags: true },
+      relations: { authors: true, tags: true, faq: true },
+      order: { faq: { orderIndex: 'ASC' } },
     });
 
     if (!article) {
