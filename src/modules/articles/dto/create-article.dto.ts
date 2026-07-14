@@ -112,6 +112,15 @@ export class CreateArticleDto {
   @Min(0)
   priority?: number;
 
+  @ApiPropertyOptional({
+    example: 5,
+    description: 'Время чтения статьи в минутах — указывается вручную',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  readingTime?: number | null;
+
   @ApiProperty({
     example: [1],
     description: 'ID авторов (сотрудников) статьи — минимум один',

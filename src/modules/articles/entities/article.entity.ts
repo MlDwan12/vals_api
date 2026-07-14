@@ -57,6 +57,10 @@ export class Article {
   @Column({ type: 'int', default: 0 })
   priority: number;
 
+  // Время чтения в минутах — указывается вручную в админке, не вычисляется
+  @Column({ type: 'int', nullable: true })
+  readingTime: number | null;
+
   // Авторы (many-to-many, задел на соавторов — сейчас на практике один автор)
   @ManyToMany(() => Employee, (employee) => employee.articles, {
     onDelete: 'RESTRICT',

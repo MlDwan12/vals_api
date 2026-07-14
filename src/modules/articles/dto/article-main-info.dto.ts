@@ -21,6 +21,9 @@ export class ArticleMainInfoDto {
   @ApiProperty()
   priority!: number;
 
+  @ApiProperty({ nullable: true })
+  readingTime!: number | null;
+
   @ApiProperty()
   createdAt!: Date;
 
