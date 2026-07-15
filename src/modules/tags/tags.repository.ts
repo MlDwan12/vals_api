@@ -56,19 +56,31 @@ export class TagRepository extends BaseCrudRepository<Tag> {
     }));
   }
 
-  /** Публичный список для дропдауна фильтра — только теги, реально использованные в опубликованном контенте. */
-  async findPublicList(): Promise<TagShortDto[]> {
+  /**
+   * Публичный список для фильтра на сайте — только теги, реально использованные
+   * в опубликованном контенте. `type` сужает до одного источника (статьи/кейсы) —
+   * без него это объединение обоих (как было раньше, для обратной совместимости).
+   */
+  async findPublicList(type?: 'article' | 'case'): Promise<TagShortDto[]> {
+    const articleIds = `
+      SELECT at.tag_id FROM article_tags at
+      INNER JOIN articles a ON a.id = at.article_id
+      WHERE a.date_published IS NOT NULL AND a.date_published <= NOW()
+    `;
+    const caseIds = `
+      SELECT ct.tag_id FROM case_tags ct
+      INNER JOIN cases c ON c.id = ct.case_id
+      WHERE c.date_published IS NOT NULL AND c.date_published <= NOW()
+    `;
+
+    const idsQuery =
+      type === 'article' ? articleIds
+      : type === 'case' ? caseIds
+      : `${articleIds} UNION ${caseIds}`;
+
     return this.repository.query(`
       SELECT DISTINCT t.id, t.slug, t.name FROM tags t
-      WHERE t.id IN (
-        SELECT at.tag_id FROM article_tags at
-        INNER JOIN articles a ON a.id = at.article_id
-        WHERE a.date_published IS NOT NULL AND a.date_published <= NOW()
-        UNION
-        SELECT ct.tag_id FROM case_tags ct
-        INNER JOIN cases c ON c.id = ct.case_id
-        WHERE c.date_published IS NOT NULL AND c.date_published <= NOW()
-      )
+      WHERE t.id IN (${idsQuery})
       ORDER BY t.name ASC
     `);
   }

@@ -52,8 +52,8 @@ export class TagsService extends BaseCrudService<Tag, CreateTagDto, UpdateTagDto
     return this.repository.findAllWithCounts();
   }
 
-  async findPublicList(): Promise<TagShortDto[]> {
-    return this.repository.findPublicList();
+  async findPublicList(type?: 'article' | 'case'): Promise<TagShortDto[]> {
+    return this.repository.findPublicList(type);
   }
 
   private async generateUniqueSlug(name: string, excludeId?: number): Promise<string> {
