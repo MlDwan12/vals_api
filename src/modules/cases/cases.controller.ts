@@ -7,6 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
+import { ContentSitemapItemDto } from 'src/shared/dto/content-sitemap-item.dto';
 import { SimilarContentQueryDto } from 'src/shared/dto/similar-content-query.dto';
 import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 import { Case } from './entities/case.entity';
@@ -31,6 +32,13 @@ export class CasesController {
     @Query() query: ContentListQueryDto,
   ): Promise<AdminPaginatedResponse<Case>> {
     return this.service.findListPublishedCaseMainInfo(query);
+  }
+
+  @Get('published/all')
+  @ApiOperation({ summary: 'Все опубликованные кейсы без пагинации (sitemap.xml, карта сайта)' })
+  @ApiOkResponse({ description: 'Полный список опубликованных кейсов (slug/title/updatedAt)' })
+  async getPublishedAll(): Promise<ContentSitemapItemDto[]> {
+    return this.service.findAllPublishedSitemapItems();
   }
 
   @Get('service/:slug')

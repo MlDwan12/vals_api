@@ -8,6 +8,7 @@ import { EMPLOYEE_SHORT_FIELDS } from '../employees/queries/employee.selects';
 import { TAG_SHORT_FIELDS } from '../tags/queries/tag.selects';
 import { ArticleMainInfoDto } from './dto/article-main-info.dto';
 import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
+import { ContentSitemapItemDto } from 'src/shared/dto/content-sitemap-item.dto';
 import { SortByDate } from 'src/shared/enums/sort-by-date.enum';
 import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
@@ -144,6 +145,23 @@ export class ArticleRepository extends BaseCrudRepository<Article> {
       total,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  /**
+   * Все опубликованные статьи, без пагинации — только slug/title/updatedAt.
+   * Для sitemap.xml и человекочитаемой карты сайта, не для обычных списков
+   * на сайте (там нужна пагинация — см. findPublishedMainInfoList выше).
+   */
+  async findAllPublishedSlim(): Promise<ContentSitemapItemDto[]> {
+    return this.repository
+      .createQueryBuilder('article')
+      .select('article.slug', 'slug')
+      .addSelect('article.title', 'title')
+      .addSelect('article.updatedAt', 'updatedAt')
+      .where('article.datePublished IS NOT NULL')
+      .andWhere('article.datePublished <= :now', { now: new Date() })
+      .orderBy('article.datePublished', 'DESC')
+      .getRawMany();
   }
 
   async findBySlug(slug: string): Promise<Article | null> {

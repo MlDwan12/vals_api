@@ -25,6 +25,7 @@ import { TAG_SHORT_FIELDS } from '../tags/queries/tag.selects';
 import { CaseSearchDocumentBuilder } from '../search/builders/case-search-document.builder';
 import { SearchIndexService } from '../search/services/search-index.service';
 import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
+import { ContentSitemapItemDto } from 'src/shared/dto/content-sitemap-item.dto';
 import { SortByDate } from 'src/shared/enums/sort-by-date.enum';
 import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
@@ -289,6 +290,23 @@ export class CasesService extends BaseCrudService<
       total,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  /**
+   * Все опубликованные кейсы, без пагинации — только slug/title/updatedAt.
+   * Для sitemap.xml и человекочитаемой карты сайта, не для обычных списков
+   * на сайте (там нужна пагинация — см. findListPublishedCaseMainInfo ниже).
+   */
+  async findAllPublishedSitemapItems(): Promise<ContentSitemapItemDto[]> {
+    return this.repository.repository
+      .createQueryBuilder('cases')
+      .select('cases.slug', 'slug')
+      .addSelect('cases.title', 'title')
+      .addSelect('cases.updatedAt', 'updatedAt')
+      .where('cases.datePublished IS NOT NULL')
+      .andWhere('cases.datePublished <= :now', { now: new Date() })
+      .orderBy('cases.datePublished', 'DESC')
+      .getRawMany();
   }
 
   /** Публичный эндпоинт сайта — список опубликованных кейсов с пагинацией */

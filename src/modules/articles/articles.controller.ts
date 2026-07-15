@@ -7,6 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { ArticleMainInfoDto } from './dto/article-main-info.dto';
 import { ContentListQueryDto } from 'src/shared/dto/content-list-query.dto';
+import { ContentSitemapItemDto } from 'src/shared/dto/content-sitemap-item.dto';
 import { SimilarContentQueryDto } from 'src/shared/dto/similar-content-query.dto';
 import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
@@ -31,6 +32,13 @@ export class ArticlesController {
     @Query() query: ContentListQueryDto,
   ): Promise<AdminPaginatedResponse<ArticleMainInfoDto>> {
     return this.service.findListPublishedArticleMainInfo(query);
+  }
+
+  @Get('published/all')
+  @ApiOperation({ summary: 'Все опубликованные статьи без пагинации (sitemap.xml, карта сайта)' })
+  @ApiOkResponse({ description: 'Полный список опубликованных статей (slug/title/updatedAt)' })
+  async getPublishedAll(): Promise<ContentSitemapItemDto[]> {
+    return this.service.findAllPublishedSitemapItems();
   }
 
   @Get('info/:slug')

@@ -245,6 +245,11 @@ export class ArticlesService extends BaseCrudService<
     return article;
   }
 
+  /** Все опубликованные статьи без пагинации — sitemap.xml и человекочитаемая карта сайта. */
+  async findAllPublishedSitemapItems() {
+    return this.repository.findAllPublishedSlim();
+  }
+
   /** Похожие статьи по совпадению тегов — блок «Похожие статьи» на странице статьи/кейса. */
   async findSimilarPublished(
     tagIds: number[],
