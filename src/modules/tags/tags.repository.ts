@@ -40,7 +40,7 @@ export class TagRepository extends BaseCrudRepository<Tag> {
       .createQueryBuilder('tag')
       .leftJoin('article_tags', 'at', 'at.tag_id = tag.id')
       .leftJoin('case_tags', 'ct', 'ct.tag_id = tag.id')
-      .select(['tag.id AS id', 'tag.slug AS slug', 'tag.name AS name'])
+      .select(['tag.id AS id', 'tag.slug AS slug', 'tag.name AS name', 'tag.priority AS priority'])
       .addSelect('COUNT(DISTINCT at.article_id)', 'articlesCount')
       .addSelect('COUNT(DISTINCT ct.case_id)', 'casesCount')
       .groupBy('tag.id')
@@ -51,6 +51,7 @@ export class TagRepository extends BaseCrudRepository<Tag> {
       id: r.id,
       slug: r.slug,
       name: r.name,
+      priority: Number(r.priority),
       articlesCount: Number(r.articlesCount),
       casesCount: Number(r.casesCount),
     }));
@@ -79,9 +80,9 @@ export class TagRepository extends BaseCrudRepository<Tag> {
       : `${articleIds} UNION ${caseIds}`;
 
     return this.repository.query(`
-      SELECT DISTINCT t.id, t.slug, t.name FROM tags t
+      SELECT DISTINCT t.id, t.slug, t.name, t.priority FROM tags t
       WHERE t.id IN (${idsQuery})
-      ORDER BY t.name ASC
+      ORDER BY t.priority DESC, t.name ASC
     `);
   }
 }

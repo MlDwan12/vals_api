@@ -25,20 +25,30 @@ export class TagsService extends BaseCrudService<Tag, CreateTagDto, UpdateTagDto
     if (existing) return existing;
 
     const slug = await this.generateUniqueSlug(name);
-    return this.repository.create({ name, slug });
+    return this.repository.create({ name, slug, priority: dto.priority ?? 0 });
   }
 
-  /** Переопределяет generic update — при смене name перегенерирует slug. */
+  /** Переопределяет generic update — при смене name перегенерирует slug, plus сохраняет priority. */
   async update(id: number, dto: UpdateTagDto): Promise<Tag> {
     const tag = await this.findById(id);
+    let changed = false;
 
     if (dto.name !== undefined) {
       const name = dto.name.trim();
       if (name !== tag.name) {
         tag.name = name;
         tag.slug = await this.generateUniqueSlug(name, tag.id);
-        await this.repository.repository.save(tag);
+        changed = true;
       }
+    }
+
+    if (dto.priority !== undefined && dto.priority !== tag.priority) {
+      tag.priority = dto.priority;
+      changed = true;
+    }
+
+    if (changed) {
+      await this.repository.repository.save(tag);
     }
 
     return tag;

@@ -22,6 +22,10 @@ export class Tag {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
+  // порядок тега в списках/фильтре на сайте — не влияет на сортировку статей/кейсов
+  @Column({ type: 'int', default: 0 })
+  priority: number;
+
   @ManyToMany(() => Article, (article) => article.tags)
   articles: Article[];
 

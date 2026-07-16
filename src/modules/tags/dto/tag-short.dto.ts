@@ -10,4 +10,7 @@ export class TagShortDto {
 
   @ApiProperty()
   name!: string;
+
+  @ApiProperty()
+  priority!: number;
 }
