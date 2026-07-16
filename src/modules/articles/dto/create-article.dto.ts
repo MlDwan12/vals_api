@@ -12,6 +12,7 @@ import {
   IsArray,
   ArrayMinSize,
   ArrayMaxSize,
+  IsBoolean,
 } from 'class-validator';
 import { MaxKeywords } from 'src/common/validators/max-keywords.validator';
 
@@ -118,6 +119,14 @@ export class CreateArticleDto {
   @IsInt()
   @Min(1)
   readingTime?: number | null;
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Показывать оглавление на странице статьи',
+  })
+  @IsOptional()
+  @IsBoolean()
+  hasToc?: boolean;
 
   @ApiProperty({
     example: [1],

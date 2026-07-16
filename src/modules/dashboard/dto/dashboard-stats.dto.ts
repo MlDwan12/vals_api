@@ -1,11 +1,13 @@
 export class ArticleStatsDto {
   total: number;
   published: number;
+  scheduled: number;
 }
 
 export class CaseStatsDto {
   total: number;
   published: number;
+  scheduled: number;
 }
 
 export class ServiceStatsDto {

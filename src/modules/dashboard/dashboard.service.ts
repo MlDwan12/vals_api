@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { And, LessThanOrEqual, Not, IsNull, Repository } from 'typeorm';
+import { And, LessThanOrEqual, MoreThan, Not, IsNull, Repository } from 'typeorm';
 import { Article } from '../articles/entities/article.entity';
 import { Case } from '../cases/entities/case.entity';
 import { Service } from '../services/entities/service.entity';
@@ -33,8 +33,10 @@ export class DashboardService {
     const [
       articlesTotal,
       articlesPublished,
+      articlesScheduled,
       casesTotal,
       casesPublished,
+      casesScheduled,
       servicesTotal,
       clientsTotal,
       leadsTotal,
@@ -43,9 +45,15 @@ export class DashboardService {
       this.articleRepo.count({
         where: { datePublished: And(Not(IsNull()), LessThanOrEqual(now)) },
       }),
+      this.articleRepo.count({
+        where: { datePublished: And(Not(IsNull()), MoreThan(now)) },
+      }),
       this.caseRepo.count(),
       this.caseRepo.count({
         where: { datePublished: And(Not(IsNull()), LessThanOrEqual(now)) },
+      }),
+      this.caseRepo.count({
+        where: { datePublished: And(Not(IsNull()), MoreThan(now)) },
       }),
       this.serviceRepo.count(),
       this.clientRepo.count(),
@@ -53,8 +61,8 @@ export class DashboardService {
     ]);
 
     return {
-      articles: { total: articlesTotal, published: articlesPublished },
-      cases: { total: casesTotal, published: casesPublished },
+      articles: { total: articlesTotal, published: articlesPublished, scheduled: articlesScheduled },
+      cases: { total: casesTotal, published: casesPublished, scheduled: casesScheduled },
       services: { total: servicesTotal },
       clients: { total: clientsTotal, totalLeads: leadsTotal },
     };

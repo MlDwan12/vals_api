@@ -61,6 +61,10 @@ export class Article {
   @Column({ type: 'int', nullable: true })
   readingTime: number | null;
 
+  // Показывать автособираемое оглавление по заголовкам H1-H3 на странице статьи
+  @Column({ type: 'boolean', default: false })
+  hasToc: boolean;
+
   // Авторы (many-to-many, задел на соавторов — сейчас на практике один автор)
   @ManyToMany(() => Employee, (employee) => employee.articles, {
     onDelete: 'RESTRICT',

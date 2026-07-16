@@ -57,6 +57,7 @@ export class ArticlesService extends BaseCrudService<
         datePublished: dto.datePublished ? new Date(dto.datePublished) : null,
         priority: dto.priority ?? 0,
         readingTime: dto.readingTime ?? null,
+        hasToc: dto.hasToc ?? false,
         authors,
         tags,
       });
@@ -117,6 +118,7 @@ export class ArticlesService extends BaseCrudService<
       }
       if (dto.priority !== undefined) existing.priority = dto.priority;
       if (dto.readingTime !== undefined) existing.readingTime = dto.readingTime;
+      if (dto.hasToc !== undefined) existing.hasToc = dto.hasToc;
 
       const saved = await articleRepo.save(existing);
 
