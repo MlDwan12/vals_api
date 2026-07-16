@@ -9,6 +9,8 @@ import { CoreModule } from './core/core.module';
 import { DatabaseConfig } from './shared/types/config/db.config.type';
 import { LoggerConfig } from './shared/types/config/logger.config.type';
 import { FaqModule } from './modules/faq/faq.module';
+import { ArticleFaqModule } from './modules/article-faq/article-faq.module';
+import { CaseFaqModule } from './modules/case-faq/case-faq.module';
 import { IndustryModule } from './modules/industry/industry.module';
 
 import bitrixConfig from './config/bitrix.config';
@@ -99,6 +101,7 @@ import { TagsModule } from './modules/tags/tags.module';
     CoreModule,
     FaqModule,
     CasesModule,
+    CaseFaqModule,
     IndustryModule,
     ServicesModule,
     ServiceCategoriesModule,
@@ -109,6 +112,7 @@ import { TagsModule } from './modules/tags/tags.module';
     BitrixModule,
     AuthModule,
     ArticlesModule,
+    ArticleFaqModule,
     ImageLibModule,
     MediaModule,
     ClientModule,

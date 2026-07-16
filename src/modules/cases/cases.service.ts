@@ -11,7 +11,7 @@ import { CaseRepository } from './cases.repository';
 import { PinoLogger } from 'nestjs-pino';
 import { BaseCrudService } from 'src/core/crud/base.service';
 import { BaseCrudRepository } from 'src/core/crud/base.repository';
-import { EntityManager, In, Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Service } from '../services/entities/service.entity';
 import { CASES_MAIN_FIELDS } from '../services/queries/service.selects';
@@ -114,40 +114,15 @@ export class CasesService extends BaseCrudService<
 
       const saved = await em.getRepository(Case).save(entity);
 
-      if (dto.faq?.length) {
-        await this.saveFaq(em, saved.id, dto.faq);
-      }
-
       await this.searchIndexService.upsertDocument(
         this.caseSearchDocumentBuilder.build(saved),
       );
       return em.getRepository(Case).findOneOrFail({
         where: { id: saved.id },
         relations: { services: true, authors: true, tags: true, faq: true },
-        order: { faq: { orderIndex: 'ASC' } },
+        order: { faq: { id: 'ASC' } },
       });
     });
-  }
-
-  /** Полная замена FAQ кейса — форма админки всегда шлёт целиком актуальный список. */
-  private async saveFaq(
-    em: EntityManager,
-    caseId: number,
-    faq: { question: string; answer: string }[],
-  ): Promise<void> {
-    const faqRepo = em.getRepository(CaseFaq);
-    await faqRepo.delete({ caseId });
-
-    if (!faq.length) return;
-
-    await faqRepo.insert(
-      faq.map((item, index) => ({
-        caseId,
-        question: item.question,
-        answer: item.answer,
-        orderIndex: index,
-      })),
-    );
   }
 
   // ✅ update с M2M (НЕ через repo.update)
@@ -215,10 +190,6 @@ export class CasesService extends BaseCrudService<
 
       await caseRepo.save(existing);
 
-      if (dto.faq !== undefined) {
-        await this.saveFaq(em, id, dto.faq);
-      }
-
       await this.searchIndexService.upsertDocument(
         this.caseSearchDocumentBuilder.build(
           await caseRepo.findOneOrFail({
@@ -231,7 +202,7 @@ export class CasesService extends BaseCrudService<
       return caseRepo.findOneOrFail({
         where: { id },
         relations: { services: true, authors: true, tags: true, faq: true },
-        order: { faq: { orderIndex: 'ASC' } },
+        order: { faq: { id: 'ASC' } },
       });
     });
   }
@@ -506,12 +477,12 @@ export class CasesService extends BaseCrudService<
     return { ...row, tags };
   }
 
-  /** Подгружает FAQ кейса, отсортированный по orderIndex — отдельный запрос, тот же приём, что и attachAuthors/attachTags. */
+  /** Подгружает FAQ кейса, отсортированный по id (порядок создания) — отдельный запрос, тот же приём, что и attachAuthors/attachTags. */
   private async attachFaq(row: CaseRow): Promise<CaseRow> {
     const faq = await this.repo.manager.getRepository(CaseFaq).find({
       where: { caseId: row.id },
       select: ['id', 'question', 'answer'],
-      order: { orderIndex: 'ASC' },
+      order: { id: 'ASC' },
     });
 
     return { ...row, faq };

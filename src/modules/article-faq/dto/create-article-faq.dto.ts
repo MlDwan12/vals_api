@@ -1,10 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsInt, IsString, IsNotEmpty } from 'class-validator';
 
-export class ArticleFaqItemDto {
+export class CreateArticleFaqDto {
+  @ApiProperty({
+    example: 1,
+    description: 'ID статьи, к которой относится FAQ',
+  })
+  @IsInt()
+  articleId: number;
+
   @ApiProperty({
     example: 'ORM — это простыми словами что?',
-    description: 'Вопрос FAQ статьи',
+    description: 'Вопрос FAQ',
   })
   @IsString()
   @IsNotEmpty()
@@ -12,7 +19,7 @@ export class ArticleFaqItemDto {
 
   @ApiProperty({
     example: 'ORM — это управление тем, как компания выглядит в интернете...',
-    description: 'Ответ FAQ статьи',
+    description: 'Ответ FAQ',
   })
   @IsString()
   @IsNotEmpty()

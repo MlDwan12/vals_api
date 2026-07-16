@@ -168,7 +168,7 @@ export class ArticleRepository extends BaseCrudRepository<Article> {
     return this.repository.findOne({
       where: { slug },
       relations: { authors: true, tags: true, faq: true },
-      order: { faq: { orderIndex: 'ASC' } },
+      order: { faq: { id: 'ASC' } },
     });
   }
 
@@ -176,7 +176,7 @@ export class ArticleRepository extends BaseCrudRepository<Article> {
     return this.repository.findOne({
       where: { slug, datePublished: LessThanOrEqual(new Date()) },
       relations: { authors: true, tags: true, faq: true },
-      order: { faq: { orderIndex: 'ASC' } },
+      order: { faq: { id: 'ASC' } },
     });
   }
 

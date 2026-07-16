@@ -1,10 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsInt, IsString, IsNotEmpty } from 'class-validator';
 
-export class CaseFaqItemDto {
+export class CreateCaseFaqDto {
+  @ApiProperty({
+    example: 1,
+    description: 'ID кейса, к которому относится FAQ',
+  })
+  @IsInt()
+  caseId: number;
+
   @ApiProperty({
     example: 'Сколько занимает работа над кейсом?',
-    description: 'Вопрос FAQ кейса',
+    description: 'Вопрос FAQ',
   })
   @IsString()
   @IsNotEmpty()
@@ -12,7 +19,7 @@ export class CaseFaqItemDto {
 
   @ApiProperty({
     example: 'В среднем работа занимает 2-3 месяца...',
-    description: 'Ответ FAQ кейса',
+    description: 'Ответ FAQ',
   })
   @IsString()
   @IsNotEmpty()

@@ -29,9 +29,6 @@ export class ArticleFaq {
   @Column({ type: 'text' })
   answer: string;
 
-  @Column({ name: 'order_index', type: 'int', default: 0 })
-  orderIndex: number;
-
   @CreateDateColumn({ name: 'date_create' })
   dateCreate: Date;
 

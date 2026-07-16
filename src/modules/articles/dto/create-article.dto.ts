@@ -12,10 +12,8 @@ import {
   IsArray,
   ArrayMinSize,
   ArrayMaxSize,
-  ValidateNested,
 } from 'class-validator';
 import { MaxKeywords } from 'src/common/validators/max-keywords.validator';
-import { ArticleFaqItemDto } from './article-faq-item.dto';
 
 export class CreateArticleDto {
   @ApiProperty({
@@ -144,16 +142,4 @@ export class CreateArticleDto {
   @IsInt({ each: true })
   @Min(1, { each: true })
   tagIds?: number[];
-
-  @ApiPropertyOptional({
-    type: [ArticleFaqItemDto],
-    description:
-      'Список FAQ статьи (вопрос/ответ) — полностью заменяет текущий список при обновлении, порядок = порядок в массиве',
-  })
-  @IsOptional()
-  @IsArray()
-  @ArrayMaxSize(15)
-  @ValidateNested({ each: true })
-  @Type(() => ArticleFaqItemDto)
-  faq?: ArticleFaqItemDto[];
 }
