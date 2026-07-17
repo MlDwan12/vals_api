@@ -58,6 +58,20 @@ import { TagsModule } from './modules/tags/tags.module';
         return {
           pinoHttp: {
             level: logger.level,
+            // Не логируем успешные запросы (2xx/3xx) — иначе частые GET'ы
+            // забивают логи и вытесняют полезные ошибки. Упавшие запросы
+            // логируются с контекстом (метод/url/статус/время).
+            customLogLevel: (_req, res, err) => {
+              if (err || res.statusCode >= 500) return 'error';
+              if (res.statusCode >= 400) return 'warn';
+              return 'silent';
+            },
+            // Не пишем в логи токены/куки из заголовков.
+            redact: [
+              'req.headers.authorization',
+              'req.headers.cookie',
+              'res.headers["set-cookie"]',
+            ],
             transport: logger.pretty
               ? {
                   target: 'pino-pretty',

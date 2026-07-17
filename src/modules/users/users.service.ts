@@ -47,6 +47,11 @@ export class UsersService extends BaseCrudService<
       patch.password = await this.hashPassword(patch.password);
     }
 
+    // TODO: username здесь не нормализуется к нижнему регистру, в отличие от
+    // createWithRole (trim().toLowerCase()). Логин чувствителен к регистру,
+    // поэтому переименование через PATCH в имя с заглавными потребует входа
+    // ровно в том же регистре. Привести к единому поведению позже.
+
     return super.update(id, patch);
   }
 
