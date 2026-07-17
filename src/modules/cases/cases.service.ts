@@ -33,6 +33,7 @@ type CaseRow = {
   id: number;
   slug: string;
   title: string;
+  hasToc: boolean;
   createdAt: Date;
   updatedAt: Date;
   serviceIds: number[];
@@ -107,6 +108,7 @@ export class CasesService extends BaseCrudService<
         keywords: dto.keywords,
         datePublished: dto.datePublished ? new Date(dto.datePublished) : null,
         priority: dto.priority ?? 0,
+        hasToc: dto.hasToc ?? false,
         services,
         authors,
         tags,
@@ -187,6 +189,7 @@ export class CasesService extends BaseCrudService<
       if (dto.keywords !== undefined) existing.keywords = dto.keywords;
       if ('datePublished' in dto) existing.datePublished = dto.datePublished ? new Date(dto.datePublished) : null;
       if (dto.priority !== undefined) existing.priority = dto.priority;
+      if (dto.hasToc !== undefined) existing.hasToc = dto.hasToc;
 
       await caseRepo.save(existing);
 
@@ -420,6 +423,7 @@ export class CasesService extends BaseCrudService<
         'cases.metaTitle AS "metaTitle"',
         'cases.metaDescription AS "metaDescription"',
         'cases.keywords AS "keywords"',
+        'cases.hasToc AS "hasToc"',
         'cases.date_published AS "datePublished"',
         'cases.created_at AS "createdAt"',
         'cases.updated_at AS "updatedAt"',

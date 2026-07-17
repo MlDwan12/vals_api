@@ -74,6 +74,10 @@ export class Case {
   @Column({ type: 'int', default: 0 })
   priority: number;
 
+  // Показывать автособираемое оглавление по заголовкам H1-H3 на странице кейса
+  @Column({ type: 'boolean', default: false })
+  hasToc: boolean;
+
   // Авторы (many-to-many, задел на соавторов — сейчас на практике один автор)
   @ManyToMany(() => Employee, (employee) => employee.cases, {
     onDelete: 'RESTRICT',
