@@ -35,6 +35,21 @@ export class UsersService extends BaseCrudService<
     return this.userRepository.findByUsernameForAuth(username.trim());
   }
 
+  /**
+   * Обновление пользователя. Переопределяет базовый update, потому что
+   * BaseCrudService пишет DTO как есть — без этого пароль лёг бы в БД
+   * плейнтекстом и логин сломался бы (bcrypt.compare не сошёлся бы).
+   */
+  async update(id: number, dto: UpdateUserDto): Promise<User> {
+    const patch: UpdateUserDto = { ...dto };
+
+    if (patch.password) {
+      patch.password = await this.hashPassword(patch.password);
+    }
+
+    return super.update(id, patch);
+  }
+
   async createAdmin(dto: CreateUserDto): Promise<void> {
     await this.createWithRole(dto.username, dto.password, UserRole.ADMIN);
   }
@@ -71,19 +86,7 @@ export class UsersService extends BaseCrudService<
       throw new ConflictException('Пользователь с таким именем уже существует');
     }
 
-    let passwordHash: string;
-
-    try {
-      passwordHash = await bcrypt.hash(password, 12);
-    } catch (error: unknown) {
-      this.logger.error(
-        { err: error, username: normalizedUsername, role },
-        'Failed to hash user password',
-      );
-      throw new InternalServerErrorException(
-        'Не удалось обработать пароль пользователя',
-      );
-    }
+    const passwordHash = await this.hashPassword(password);
 
     try {
       await this.userRepository.create({
@@ -102,6 +105,17 @@ export class UsersService extends BaseCrudService<
         'Failed to save user',
       );
       throw new InternalServerErrorException('Не удалось создать пользователя');
+    }
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    try {
+      return await bcrypt.hash(password, 12);
+    } catch (error: unknown) {
+      this.logger.error({ err: error }, 'Failed to hash user password');
+      throw new InternalServerErrorException(
+        'Не удалось обработать пароль пользователя',
+      );
     }
   }
 
