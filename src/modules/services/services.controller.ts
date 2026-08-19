@@ -1,115 +1,42 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Query,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Service } from './entities/service.entity';
-import { CreateServiceDto } from './dto/create-service.dto';
-import { UpdateServiceDto } from './dto/update-service.dto';
 import { ServicesService } from './services.service';
-import { BaseCrudController } from 'src/core/crud/base.controller';
-import { ServiceSearchReindexService } from './services-search-reindex.service';
-import { ReindexResult } from '../search/interfaces/reindex-result.interface';
-import { AdminListQueryDto } from 'src/shared/dto/admin-list-query.dto';
-import { AdminPaginatedResponse } from 'src/core/crud/interfaces/pagination.interface';
 
 @ApiTags('Услуги')
 @Controller('services')
-export class ServicesController extends BaseCrudController<
-  Service,
-  CreateServiceDto,
-  UpdateServiceDto
-> {
-  protected entityName: string;
-
-  constructor(
-    protected readonly service: ServicesService,
-    private readonly serviceSearchReindexService: ServiceSearchReindexService,
-  ) {
-    super(service);
-  }
+export class ServicesController {
+  constructor(private readonly service: ServicesService) {}
 
   @Get('all/info')
   async findAllWithRelations() {
-    try {
-      return await this.service.findAllWithRelations();
-    } catch (e) {
-      console.error('REAL ERROR:', e);
-      throw e;
-    }
+    return this.service.findAllWithRelations();
   }
 
   @Get('all/short-info')
   async getShortServiceInfoList() {
-    try {
-      return await this.service.findListServiceShortInfo();
-    } catch (e) {
-      console.error('REAL ERROR:', e);
-      throw e;
-    }
-  }
-
-  @Get('all/main-info')
-  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
-  async getMainServiceInfoList(
-    @Query() query: AdminListQueryDto,
-  ): Promise<AdminPaginatedResponse<Service>> {
-    try {
-      return await this.service.findListServiceMainInfo(query);
-    } catch (e) {
-      console.error('REAL ERROR:', e);
-      throw e;
-    }
+    return this.service.findListServiceShortInfo();
   }
 
   @Get('all/full-info')
   async getFullServiceInfoList() {
-    try {
-      return await this.service.findListServiceFullInfo();
-    } catch (e) {
-      console.error('REAL ERROR:', e);
-      throw e;
-    }
+    return this.service.findListServiceFullInfo();
   }
 
   @Get('list/faq')
   async getListServicesWithFaq() {
-    try {
-      return await this.service.getListServicesWithFaq();
-    } catch (e) {
-      console.error('REAL ERROR:', e);
-      throw e;
-    }
+    return this.service.getListServicesWithFaq();
   }
 
   @Get('info/:slug')
-  @ApiOperation({ summary: 'Получить элемент по ID' })
-  @ApiOkResponse({ description: 'Элемент найден' })
-  @ApiNotFoundResponse({ description: 'Элемент не найден' })
+  @ApiOperation({ summary: 'Получить услугу по slug (сайт)' })
+  @ApiOkResponse({ description: 'Услуга найдена' })
+  @ApiNotFoundResponse({ description: 'Услуга не найдена' })
   async getServiceInfo(@Param('slug') slug: string) {
-    try {
-      return await this.service.findOneByIDWithRelations(slug);
-    } catch (e) {
-      console.error('REAL ERROR:', e);
-      throw e;
-    }
-  }
-
-  @Post('reindex')
-  @HttpCode(HttpStatus.OK)
-  async reindex(): Promise<ReindexResult> {
-    return this.serviceSearchReindexService.reindex();
+    return this.service.findOneByIDWithRelations(slug);
   }
 }

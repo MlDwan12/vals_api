@@ -11,6 +11,7 @@ import {
   Min,
   ArrayMinSize,
   IsDateString,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateCaseDto {
@@ -84,4 +85,36 @@ export class CreateCaseDto {
   @IsInt()
   @Min(0)
   priority?: number;
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Показывать оглавление на странице кейса',
+  })
+  @IsOptional()
+  @IsBoolean()
+  hasToc?: boolean;
+
+  @ApiProperty({
+    example: [1],
+    description: 'ID авторов (сотрудников) кейса — минимум один',
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(5)
+  @Type(() => Number)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  authorIds: number[];
+
+  @ApiPropertyOptional({
+    example: [1, 2],
+    description: 'ID тегов кейса (необязательно)',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @Type(() => Number)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  tagIds?: number[];
 }

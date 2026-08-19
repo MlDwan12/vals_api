@@ -9,15 +9,26 @@ import {
   Post,
   Query,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiTags,
+} from '@nestjs/swagger';
 import { MediaService } from './media.service';
 import { GetMediaDto } from './dto/get-media.dto';
 import { UploadMediaDto } from './dto/upload-media.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { DomainRestrictionGuard } from 'src/common/guards/domain-restriction.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { CONTENT_ROLES } from 'src/common/constants/roles.constant';
 
 @ApiTags('media')
 @Controller('media')
@@ -25,12 +36,18 @@ export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...CONTENT_ROLES)
+  @ApiBearerAuth()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   getMedia(@Query() query: GetMediaDto) {
     return this.mediaService.getMedia(query);
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard, DomainRestrictionGuard)
+  @Roles(...CONTENT_ROLES)
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -58,7 +75,10 @@ export class MediaController {
       },
       fileFilter: (req, file, cb) => {
         if (file.mimetype !== 'image/webp') {
-          return cb(new BadRequestException('Разрешены только WEBP файлы'), false);
+          return cb(
+            new BadRequestException('Разрешены только WEBP файлы'),
+            false,
+          );
         }
         cb(null, true);
       },
@@ -75,6 +95,9 @@ export class MediaController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard, DomainRestrictionGuard)
+  @Roles(...CONTENT_ROLES)
+  @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.mediaService.remove(id);
   }

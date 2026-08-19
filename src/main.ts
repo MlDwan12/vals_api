@@ -1,16 +1,16 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
-import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { GlobalValidationPipe } from './common/security/validation/validation.pipe';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true, // обязательно с nestjs-pino
   });
   const allowed = process.env.APP_CORS_ORIGINS!.split(',');
@@ -21,9 +21,16 @@ async function bootstrap() {
   app.useLogger(logger);
 
   // Базовая безопасность и перфоманс
-  app.use(helmet()); // Helmet (можно заменить на наш HelmetGuard, если хочешь тонкую настройку CSP)
+  // app.use(helmet()); // для прода
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow images from /uploads to be loaded cross-origin
+  }));
   app.use(cookieParser());
   app.use(compression());
+
+  // Дефолтный лимит body-parser (100kb) слишком мал для контента статей (TipTap JSON + дублирующийся contentHtml)
+  app.useBodyParser('json', { limit: '1mb' });
+  app.useBodyParser('urlencoded', { limit: '1mb', extended: true });
 
   app.enableCors({
     origin: [...allowed],
@@ -35,9 +42,6 @@ async function bootstrap() {
 
   // УДАЛИЛ встроенный ValidationPipe — оставляем только наш крутой
   app.useGlobalPipes(new GlobalValidationPipe());
-
-  // Глобальный фильтр исключений
-  app.useGlobalFilters(new AllExceptionsFilter()); // передай logger, если хочешь логировать
 
   // 1. Создаём OpenAPI-документ (как раньше)
 

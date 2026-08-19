@@ -1,6 +1,5 @@
 import { Global, Module, MiddlewareConsumer } from '@nestjs/common';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { AllExceptionsFilter } from '../common/filters/http-exception.filter';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from '../common/interceptors/response.interceptor';
 
 import { RequestIdMiddleware } from '../common/middleware/request-id.middleware';
@@ -11,10 +10,6 @@ import { RequestIdMiddleware } from '../common/middleware/request-id.middleware'
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
     },
   ],
   exports: [],

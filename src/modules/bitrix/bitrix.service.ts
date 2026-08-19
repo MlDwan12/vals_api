@@ -26,7 +26,7 @@ export class BitrixService {
 
     if (!webhook) {
       throw new InternalServerErrorException(
-        'Bitrix webhook is not configured',
+        'Webhook Bitrix не настроен',
       );
     }
 
@@ -160,12 +160,12 @@ export class BitrixService {
         );
 
         if (!cycle) {
-          throw new InternalServerErrorException('Period not found');
+          throw new InternalServerErrorException('Расчётный период не найден');
         }
 
         if (cycle.pricePerMonth === null) {
           throw new InternalServerErrorException(
-            'Billing cycle pricePerMonth is not configured',
+            'Цена за месяц в тарифном цикле не настроена',
           );
         }
 
@@ -182,7 +182,7 @@ export class BitrixService {
 
       default:
         throw new InternalServerErrorException(
-          `Unsupported lead type: ${lead.type}`,
+          `Неподдерживаемый тип заявки: ${lead.type}`,
         );
     }
   }

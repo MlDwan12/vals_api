@@ -9,6 +9,8 @@ import { CoreModule } from './core/core.module';
 import { DatabaseConfig } from './shared/types/config/db.config.type';
 import { LoggerConfig } from './shared/types/config/logger.config.type';
 import { FaqModule } from './modules/faq/faq.module';
+import { ArticleFaqModule } from './modules/article-faq/article-faq.module';
+import { CaseFaqModule } from './modules/case-faq/case-faq.module';
 import { IndustryModule } from './modules/industry/industry.module';
 
 import bitrixConfig from './config/bitrix.config';
@@ -31,6 +33,9 @@ import { ClientModule } from './modules/client/client.module';
 import securityConfig from './config/security.config';
 import { SearchModule } from './modules/search/search.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { EmployeesModule } from './modules/employees/employees.module';
+import { TagsModule } from './modules/tags/tags.module';
 
 @Module({
   imports: [
@@ -53,6 +58,20 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
         return {
           pinoHttp: {
             level: logger.level,
+            // Не логируем успешные запросы (2xx/3xx) — иначе частые GET'ы
+            // забивают логи и вытесняют полезные ошибки. Упавшие запросы
+            // логируются с контекстом (метод/url/статус/время).
+            customLogLevel: (_req, res, err) => {
+              if (err || res.statusCode >= 500) return 'error';
+              if (res.statusCode >= 400) return 'warn';
+              return 'silent';
+            },
+            // Не пишем в логи токены/куки из заголовков.
+            redact: [
+              'req.headers.authorization',
+              'req.headers.cookie',
+              'res.headers["set-cookie"]',
+            ],
             transport: logger.pretty
               ? {
                   target: 'pino-pretty',
@@ -79,23 +98,24 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
           password: db.password,
           database: db.database,
           autoLoadEntities: true,
-          synchronize: true,
+          synchronize: false,
         };
       },
     }),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads', // URL-префикс
-      exclude: ['/docs/(.*)'],
+      exclude: ['/docs/*splat'],
       serveStaticOptions: {
-        fallthrough: false, // fail-fast если файл не найден
-        maxAge: '7d', // кеширование для статики
+        fallthrough: true,
+        maxAge: '7d',
         immutable: true,
       },
     }),
     CoreModule,
     FaqModule,
     CasesModule,
+    CaseFaqModule,
     IndustryModule,
     ServicesModule,
     ServiceCategoriesModule,
@@ -106,11 +126,15 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     BitrixModule,
     AuthModule,
     ArticlesModule,
+    ArticleFaqModule,
     ImageLibModule,
     MediaModule,
     ClientModule,
     SearchModule,
     DashboardModule,
+    AuditModule,
+    EmployeesModule,
+    TagsModule,
   ],
   controllers: [],
   providers: [],

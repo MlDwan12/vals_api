@@ -4,17 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServiceCategoriesService } from './service_categories.service';
 import { ServiceCategoryRepository } from './service_categories.repository';
 import { ServiceCategoriesController } from './service_categories.controller';
-
-// const ServiceCategoryCrudModule = CrudModule<ServiceCategory>({
-//   entity: ServiceCategory,
-//   dto: { create: CreateServiceCategoryDto, update: UpdateServiceCategoryDto },
-//   path: 'service_categories',
-//   tags: ['Категории услуг'],
-// });
+import { ServiceCategoriesAdminController } from './service_categories-admin.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ServiceCategory])],
-  controllers: [ServiceCategoriesController],
+  controllers: [ServiceCategoriesController, ServiceCategoriesAdminController],
   providers: [ServiceCategoriesService, ServiceCategoryRepository],
   exports: [ServiceCategoriesService, ServiceCategoryRepository],
 })

@@ -40,7 +40,7 @@ export class AuthService {
     const user = await this.usersService.findOneOrFail({
       where: { id: userId },
     });
-    if (!user) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException('Не авторизован');
 
     return user;
   }

@@ -15,6 +15,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { CLIENT_ROLES } from 'src/common/constants/roles.constant';
 import { ClientContactEntity } from '../entities/client-contact.entity';
 import { ClientContactQueryDto } from '../dto/client-contact-query.dto';
 import { PaginationResult } from 'src/core/crud/interfaces/pagination.interface';
@@ -22,8 +25,9 @@ import { ClientContactService } from '../services/client-contact.service';
 
 @ApiTags('client-contacts')
 @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard)
-@Controller('client-contacts')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(...CLIENT_ROLES)
+@Controller('admin/client-contacts')
 export class ClientContactAdminController {
   constructor(private readonly clientContactService: ClientContactService) {}
 

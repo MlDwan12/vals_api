@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientService } from './services/client.service';
-import { ClientController } from './controllers/client.controller';
+import { ClientAdminController } from './controllers/client-admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
 import { ClientContactEntity } from './entities/client-contact.entity';
@@ -17,7 +17,7 @@ import { ClientLeadAdminController } from './controllers/client-lead-admin.contr
     TypeOrmModule.forFeature([ClientContactEntity, ClientLeadEntity, Client]),
   ],
   controllers: [
-    ClientController,
+    ClientAdminController,
     ClientContactAdminController,
     ClientLeadAdminController,
   ],

@@ -1,5 +1,8 @@
 import { Industry } from '../../industry/entities/industry.entity';
 import { Service } from '../../services/entities/service.entity';
+import { Employee } from '../../employees/entities/employee.entity';
+import { Tag } from '../../tags/entities/tag.entity';
+import { CaseFaq } from './case-faq.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
@@ -10,6 +13,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('cases')
@@ -69,6 +73,36 @@ export class Case {
 
   @Column({ type: 'int', default: 0 })
   priority: number;
+
+  // Показывать автособираемое оглавление по заголовкам H1-H3 на странице кейса
+  @Column({ type: 'boolean', default: false })
+  hasToc: boolean;
+
+  // Авторы (many-to-many, задел на соавторов — сейчас на практике один автор)
+  @ManyToMany(() => Employee, (employee) => employee.cases, {
+    onDelete: 'RESTRICT',
+  })
+  @JoinTable({
+    name: 'case_authors',
+    joinColumn: { name: 'case_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'employee_id', referencedColumnName: 'id' },
+  })
+  authors: Employee[];
+
+  // Теги — many-to-many, общий справочник со статьями и кейсами
+  @ManyToMany(() => Tag, (tag) => tag.cases, {
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'case_tags',
+    joinColumn: { name: 'case_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
+  })
+  tags: Tag[];
+
+  // FAQ кейса — структурированные данные для FAQPage JSON-LD, порядок задаёт orderIndex
+  @OneToMany(() => CaseFaq, (faq) => faq.case)
+  faq: CaseFaq[];
 
   // ===== Даты =====
   @CreateDateColumn({ name: 'created_at' })

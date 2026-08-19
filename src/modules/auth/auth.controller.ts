@@ -40,7 +40,7 @@ export class AuthController {
       dto.password,
     );
 
-    if (!user) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException('Неверный логин или пароль');
 
     const tokens = await this.authService.login(user);
 
@@ -81,8 +81,8 @@ export class AuthController {
 
   @Get('logout')
   logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
+    res.clearCookie('accessToken', { httpOnly: true, sameSite: 'lax' });
+    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'lax' });
     return { message: 'logout' };
   }
 }

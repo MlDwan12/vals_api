@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { Tariff } from './entities/tariff.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServicesModule } from '../services/services.module';
-import { TariffsController } from './tariffs.controller';
+import { TariffsAdminController } from './tariffs-admin.controller';
 import { TariffsService } from './tariffs.service';
 import { TariffsRepository } from './tariffs.repository';
 import { TariffPeriodsModule } from '../tariff_periods/tariff_periods.module';
@@ -13,7 +13,7 @@ import { TariffPeriodsModule } from '../tariff_periods/tariff_periods.module';
     ServicesModule,
     TariffPeriodsModule,
   ],
-  controllers: [TariffsController],
+  controllers: [TariffsAdminController],
   providers: [TariffsService, TariffsRepository],
   exports: [TariffsService],
 })

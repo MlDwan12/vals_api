@@ -84,7 +84,7 @@ export abstract class BaseCrudRepository<T extends { id: number }> {
       order,
     });
 
-    return { data, total, page, limit };
+    return { items: data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   async update(

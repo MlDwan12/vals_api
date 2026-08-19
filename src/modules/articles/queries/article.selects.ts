@@ -14,7 +14,11 @@ export const ARTICLE_MAIN_FIELDS = [
   'article.title',
   'article.description',
   'article.datePublished',
+  'article.metaTitle',
+  'article.metaDescription',
+  'article.keywords',
   'article.priority',
+  'article.readingTime',
   'article.createdAt',
   'article.updatedAt',
 ];

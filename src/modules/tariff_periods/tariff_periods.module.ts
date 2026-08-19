@@ -4,10 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TariffPeriodsService } from './tariff_periods.service';
 import { TariffPeriodRepository } from './tariff_periods.repository';
 import { TariffPeriodsController } from './tariff_periods.controller';
+import { TariffPeriodsAdminController } from './tariff_periods-admin.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([TariffPeriod])],
-  controllers: [TariffPeriodsController],
+  controllers: [TariffPeriodsController, TariffPeriodsAdminController],
   providers: [TariffPeriodsService, TariffPeriodRepository],
   exports: [TariffPeriodsService],
 })

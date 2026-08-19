@@ -30,16 +30,15 @@ export class DomainRestrictionGuard implements CanActivate {
     }
 
     const originHeader = request.headers.origin;
-    console.log('originHeader=====>', originHeader);
 
     if (typeof originHeader !== 'string' || originHeader.length === 0) {
       throw new ForbiddenException(
-        'Origin header is required for mutation requests',
+        'Заголовок Origin обязателен для изменяющих запросов',
       );
     }
 
     if (!this.allowedOrigins.has(originHeader)) {
-      throw new ForbiddenException('Origin is not allowed for this operation');
+      throw new ForbiddenException('Источник запроса не разрешён для данной операции');
     }
 
     return true;

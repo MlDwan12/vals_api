@@ -14,8 +14,6 @@ export class UserRepository extends BaseCrudRepository<User> {
   }
 
   async findByUsernameForAuth(username: string): Promise<User | null> {
-    console.log(username);
-
     return this.repo.findOne({
       where: { username },
       select: {

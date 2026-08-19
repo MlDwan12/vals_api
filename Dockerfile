@@ -35,14 +35,10 @@ ENV NODE_ENV=production
 # Создаем пользователя без root прав
 RUN addgroup -S app && adduser -S app -G app
 
-# Копируем только нужное из builder
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/yarn.lock ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-
-# Меняем владельца рабочей директории на нового пользователя
-RUN chown -R app:app /app
+# Копируем только нужное из builder (--chown избегает отдельного слоя для chown)
+COPY --chown=app:app --from=builder /app/package.json ./
+COPY --chown=app:app --from=builder /app/node_modules ./node_modules
+COPY --chown=app:app --from=builder /app/dist ./dist
 
 # Переключаемся на непривилегированного пользователя
 USER app

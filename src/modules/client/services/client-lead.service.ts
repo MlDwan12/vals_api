@@ -147,7 +147,7 @@ export class ClientLeadService {
       });
 
       if (!existingClient) {
-        throw new InternalServerErrorException('Client not found');
+        throw new InternalServerErrorException('Клиент не найден');
       }
 
       return {
@@ -163,7 +163,7 @@ export class ClientLeadService {
     });
 
     if (clients.length === 0) {
-      throw new InternalServerErrorException('Matched clients not found');
+      throw new InternalServerErrorException('Совпадающие клиенты не найдены');
     }
 
     const primaryClient: Client = clients[0];
@@ -181,7 +181,7 @@ export class ClientLeadService {
 
     if (!refreshedClient) {
       throw new InternalServerErrorException(
-        'Primary client not found after merge',
+        'Основной клиент не найден после объединения',
       );
     }
 
@@ -252,7 +252,7 @@ export class ClientLeadService {
 
         if (reloaded.clientId !== clientId) {
           throw new InternalServerErrorException(
-            `Contact ${type}:${value} belongs to another client`,
+            `Контакт ${type}:${value} принадлежит другому клиенту`,
           );
         }
 
@@ -262,7 +262,7 @@ export class ClientLeadService {
 
     if (existing.clientId !== clientId) {
       throw new InternalServerErrorException(
-        `Contact ${type}:${value} belongs to another client`,
+        `Контакт ${type}:${value} принадлежит другому клиенту`,
       );
     }
   }

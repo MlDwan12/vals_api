@@ -20,7 +20,7 @@ export class ClientLeadAdminService {
     });
 
     if (!lead) {
-      throw new NotFoundException(`ClientLead with ID ${id} not found`);
+      throw new NotFoundException(`Заявка клиента с ID ${id} не найдена`);
     }
 
     return lead;
@@ -48,13 +48,14 @@ export class ClientLeadAdminService {
       take: query.limit,
     };
 
-    const [data, total] = await this.leadRepository.findAndCount(options);
+    const [items, total] = await this.leadRepository.findAndCount(options);
 
     return {
-      data,
+      items,
       total,
       page: query.page,
       limit: query.limit,
+      totalPages: Math.ceil(total / query.limit),
     };
   }
 

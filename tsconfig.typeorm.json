@@ -11,7 +11,7 @@
     "outDir": "./dist",
     "incremental": false,
     "paths": {
-      "src/*": ["./*"]
+      "src/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts"],
